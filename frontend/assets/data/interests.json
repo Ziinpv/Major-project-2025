@@ -1,0 +1,18 @@
+[
+  { "id": "travel", "label": "Du lịch" },
+  { "id": "music", "label": "Âm nhạc" },
+  { "id": "coffee", "label": "Cafe" },
+  { "id": "photography", "label": "Nhiếp ảnh" },
+  { "id": "cooking", "label": "Nấu ăn" },
+  { "id": "reading", "label": "Đọc sách" },
+  { "id": "sports", "label": "Thể thao" },
+  { "id": "fitness", "label": "Gym & Fitness" },
+  { "id": "gaming", "label": "Chơi game" },
+  { "id": "art", "label": "Nghệ thuật" },
+  { "id": "yoga", "label": "Yoga" },
+  { "id": "movies", "label": "Xem phim" },
+  { "id": "pets", "label": "Thú cưng" },
+  { "id": "dancing", "label": "Nhảy múa" },
+  { "id": "startups", "label": "Startup" }
+]
+

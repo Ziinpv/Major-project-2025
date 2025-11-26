@@ -1,0 +1,15 @@
+[
+  { "id": "hiking", "label": "Thích leo núi" },
+  { "id": "nightlife", "label": "Yêu thích nightlife" },
+  { "id": "vegan", "label": "Ăn chay" },
+  { "id": "pet-lover", "label": "Yêu thú cưng" },
+  { "id": "early-bird", "label": "Dậy sớm" },
+  { "id": "night-owl", "label": "Cú đêm" },
+  { "id": "minimalist", "label": "Tối giản" },
+  { "id": "spiritual", "label": "Hướng nội/tâm linh" },
+  { "id": "fitness", "label": "Sống healthy" },
+  { "id": "traveling", "label": "Du lịch thường xuyên" },
+  { "id": "family-oriented", "label": "Gia đình là trên hết" },
+  { "id": "career-focused", "label": "Tham vọng sự nghiệp" }
+]
+
