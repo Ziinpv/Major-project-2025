@@ -64,6 +64,24 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       return;
     }
 
+    // Validate firstName và lastName sau khi trim để đảm bảo không rỗng
+    final firstName = _firstNameController.text.trim();
+    final lastName = _lastNameController.text.trim();
+
+    if (firstName.isEmpty || firstName.length < 2) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Tên không hợp lệ. Vui lòng nhập tên có ít nhất 2 ký tự')),
+      );
+      return;
+    }
+
+    if (lastName.isEmpty || lastName.length < 2) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Họ không hợp lệ. Vui lòng nhập họ có ít nhất 2 ký tự')),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
 
     try {
@@ -77,12 +95,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       final token = await userCredential.user?.getIdToken();
 
       if (token != null) {
-        // Register with backend
+        // Register with backend - đảm bảo firstName và lastName không rỗng
         await ref.read(authProvider.notifier).registerWithFirebase(
               token,
               {
-                'firstName': _firstNameController.text.trim(),
-                'lastName': _lastNameController.text.trim(),
+                'firstName': firstName,
+                'lastName': lastName,
                 'email': _emailController.text.trim(),
                 'dateOfBirth': _selectedDate!.toIso8601String(),
               },
@@ -150,9 +168,28 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       if (token != null) {
         // Register with backend using Google account info
         final displayName = userCredential.user?.displayName ?? '';
-        final nameParts = displayName.split(' ');
-        final firstName = nameParts.isNotEmpty ? nameParts.first : '';
-        final lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
+        final nameParts = displayName.split(' ').where((part) => part.trim().isNotEmpty).toList();
+        String firstName = nameParts.isNotEmpty ? nameParts.first.trim() : '';
+        String lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ').trim() : '';
+
+        // Đảm bảo firstName không rỗng, nếu rỗng thì sử dụng email hoặc 'User'
+        if (firstName.isEmpty || firstName.length < 2) {
+          final email = userCredential.user?.email ?? '';
+          if (email.isNotEmpty) {
+            // Lấy phần trước @ của email làm firstName
+            firstName = email.split('@').first;
+            if (firstName.length < 2) {
+              firstName = 'User';
+            }
+          } else {
+            firstName = 'User';
+          }
+        }
+
+        // lastName có thể rỗng nhưng nếu có thì phải hợp lệ
+        if (lastName.isNotEmpty && lastName.length < 2) {
+          lastName = '';
+        }
 
         await ref.read(authProvider.notifier).registerWithFirebase(
               token,
@@ -256,6 +293,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     if (value == null || value.isEmpty) {
                       return 'Vui lòng nhập tên';
                     }
+                    // Kiểm tra sau khi trim để đảm bảo không chỉ là khoảng trắng
+                    final trimmedValue = value.trim();
+                    if (trimmedValue.isEmpty) {
+                      return 'Tên không được chỉ chứa khoảng trắng';
+                    }
+                    if (trimmedValue.length < 2) {
+                      return 'Tên phải có ít nhất 2 ký tự';
+                    }
                     return null;
                   },
                 ),
@@ -271,6 +316,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Vui lòng nhập họ';
+                    }
+                    // Kiểm tra sau khi trim để đảm bảo không chỉ là khoảng trắng
+                    final trimmedValue = value.trim();
+                    if (trimmedValue.isEmpty) {
+                      return 'Họ không được chỉ chứa khoảng trắng';
+                    }
+                    if (trimmedValue.length < 2) {
+                      return 'Họ phải có ít nhất 2 ký tự';
                     }
                     return null;
                   },

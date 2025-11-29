@@ -31,13 +31,29 @@ class AuthService {
     }
 
     // Chuẩn hoá dữ liệu đầu vào, fallback an toàn nếu frontend không gửi đủ
-    // Tên
+    // Tên - Ưu tiên dữ liệu từ frontend, chỉ fallback nếu thực sự không có
     const namePartsFromFirebase = firebaseUser.name?.split(' ') || [];
     const fallbackFirstName = namePartsFromFirebase.length > 0 ? namePartsFromFirebase[0] : 'User';
     const fallbackLastName = namePartsFromFirebase.length > 1 ? namePartsFromFirebase.slice(1).join(' ') : '';
 
-    const firstName = (userData.firstName || '').trim() || fallbackFirstName;
-    const lastName = (userData.lastName || '').trim() || fallbackLastName;
+    // Ưu tiên dữ liệu từ userData, chỉ fallback nếu không có hoặc rỗng
+    let firstName = userData.firstName ? String(userData.firstName).trim() : '';
+    if (!firstName || firstName.length === 0) {
+      console.log('[registerWithFirebase] firstName từ frontend rỗng, sử dụng fallback:', fallbackFirstName);
+      firstName = fallbackFirstName;
+    } else {
+      console.log('[registerWithFirebase] Sử dụng firstName từ frontend:', firstName);
+    }
+    
+    let lastName = userData.lastName ? String(userData.lastName).trim() : '';
+    if (lastName.length === 0 && fallbackLastName) {
+      console.log('[registerWithFirebase] lastName từ frontend rỗng, sử dụng fallback:', fallbackLastName);
+      lastName = fallbackLastName;
+    } else {
+      console.log('[registerWithFirebase] Sử dụng lastName từ frontend:', lastName);
+    }
+    
+    console.log('[registerWithFirebase] Dữ liệu tên cuối cùng - firstName:', firstName, 'lastName:', lastName);
 
     // Ngày sinh
     let dateOfBirth;

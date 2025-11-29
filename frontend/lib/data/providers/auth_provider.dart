@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -38,9 +39,24 @@ class AuthState {
 
 class AuthNotifier extends StateNotifier<AuthState> {
   final AuthRepository _authRepository;
+  final _streamController = StreamController<AuthState>.broadcast();
 
   AuthNotifier(this._authRepository) : super(AuthState()) {
     _loadAuthState();
+  }
+
+  Stream<AuthState> get stream => _streamController.stream;
+
+  @override
+  set state(AuthState newState) {
+    super.state = newState;
+    _streamController.add(newState);
+  }
+
+  @override
+  void dispose() {
+    _streamController.close();
+    super.dispose();
   }
 
   Future<void> _loadAuthState() async {

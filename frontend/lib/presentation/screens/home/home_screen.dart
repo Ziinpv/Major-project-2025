@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/extensions/localization_extension.dart';
 import '../discovery/discovery_screen.dart';
 import '../matches/matches_screen.dart';
 import '../chat/chat_list_screen.dart';
 import '../profile/profile_screen.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _currentIndex = 0;
 
   final List<Widget> _screens = [
@@ -23,6 +25,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    
     return Scaffold(
       body: _screens[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
@@ -30,22 +34,22 @@ class _HomeScreenState extends State<HomeScreen> {
         onTap: (index) => setState(() => _currentIndex = index),
         type: BottomNavigationBarType.fixed,
         selectedItemColor: const Color(0xFFE91E63),
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.explore),
-            label: 'Discover',
+            icon: const Icon(Icons.explore),
+            label: l10n.home_tab_discover,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Matches',
+            icon: const Icon(Icons.favorite),
+            label: l10n.home_tab_matches,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.chat),
-            label: 'Messages',
+            icon: const Icon(Icons.chat),
+            label: l10n.home_tab_messages,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
+            icon: const Icon(Icons.person),
+            label: l10n.home_tab_profile,
           ),
         ],
       ),

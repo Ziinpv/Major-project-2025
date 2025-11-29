@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../core/extensions/localization_extension.dart';
 import '../../../core/providers/app_theme_provider.dart';
 import '../../../core/providers/language_provider.dart';
 import '../../../core/providers/text_scale_provider.dart';
@@ -67,30 +68,31 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Không thể mở đường dẫn')),
+        SnackBar(content: Text(context.l10n.common_error)),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final themeMode = ref.watch(appThemeProvider);
     final language = ref.watch(languageProvider);
     final textScale = ref.watch(textScaleProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Cài đặt'),
+        title: Text(l10n.settings_title),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           _buildSection(
-            title: 'Thông tin ứng dụng',
+            title: l10n.settings_app_info,
             children: [
               ListTile(
                 leading: const Icon(Icons.info_outline),
-                title: const Text('Phiên bản'),
+                title: Text(l10n.settings_version),
                 subtitle: Text(_version),
               ),
               ListTile(
@@ -106,71 +108,30 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           ? Colors.red
                           : null,
                 ),
-                title: const Text('Trạng thái server'),
+                title: Text(l10n.settings_server_status),
                 subtitle: Text(_checkingServer
-                    ? 'Đang kiểm tra...'
+                    ? l10n.settings_checking
                     : _serverOk == true
-                        ? 'Hoạt động bình thường'
-                        : 'Không thể kết nối'),
+                        ? l10n.settings_server_ok
+                        : l10n.settings_server_error),
                 trailing: IconButton(
                   icon: const Icon(Icons.refresh),
                   onPressed: _checkingServer ? null : _checkServer,
                 ),
               ),
-              ListTile(
-                leading: const Icon(Icons.language),
-                title: const Text('Website'),
-                onTap: () => _openUrl('https://example.com'),
-              ),
-              ListTile(
-                leading: const Icon(Icons.policy_outlined),
-                title: const Text('Chính sách & Điều khoản'),
-                onTap: () => _openUrl('https://example.com/policy'),
-              ),
-              ListTile(
-                leading: const Icon(Icons.help_outline),
-                title: const Text('FAQ / Tài liệu hướng dẫn'),
-                onTap: () => _openUrl('https://example.com/faq'),
-              ),
-              ElevatedButton.icon(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Bạn đang sử dụng phiên bản mới nhất.')),
-                  );
-                },
-                icon: const Icon(Icons.system_update),
-                label: const Text('Kiểm tra cập nhật'),
-              ),
             ],
           ),
           _buildSection(
-            title: 'Tài khoản & bảo mật',
-            children: [
-              ListTile(
-                leading: const Icon(Icons.email_outlined),
-                title: const Text('Chỉnh sửa email'),
-                subtitle: const Text('Chức năng đang phát triển'),
-                onTap: () => _showComingSoon(),
-              ),
-              ListTile(
-                leading: const Icon(Icons.lock_outline),
-                title: const Text('Đổi mật khẩu'),
-                subtitle: const Text('Chức năng đang phát triển'),
-                onTap: () => _showComingSoon(),
-              ),
-            ],
-          ),
-          _buildSection(
-            title: 'Ngôn ngữ & giao diện',
+            title: l10n.settings_language_ui,
             children: [
               ListTile(
                 leading: const Icon(Icons.translate),
-                title: const Text('Ngôn ngữ'),
+                title: Text(l10n.settings_language),
                 trailing: DropdownButton<String>(
                   value: language,
-                  items: const [
-                    DropdownMenuItem(value: 'vi', child: Text('Tiếng Việt')),
-                    DropdownMenuItem(value: 'en', child: Text('English')),
+                  items: [
+                    DropdownMenuItem(value: 'vi', child: Text(l10n.settings_language_vietnamese)),
+                    DropdownMenuItem(value: 'en', child: Text(l10n.settings_language_english)),
                   ],
                   onChanged: (value) {
                     if (value != null) {
@@ -181,22 +142,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ),
               ListTile(
                 leading: const Icon(Icons.dark_mode_outlined),
-                title: const Text('Giao diện'),
-                subtitle: const Text('Chọn chế độ sáng/tối hoặc theo hệ thống'),
+                title: Text(l10n.settings_theme),
+                subtitle: Text(l10n.settings_theme_subtitle),
                 trailing: DropdownButton<ThemeMode>(
                   value: themeMode,
-                  items: const [
+                  items: [
                     DropdownMenuItem(
                       value: ThemeMode.system,
-                      child: Text('Theo hệ thống'),
+                      child: Text(l10n.settings_theme_system),
                     ),
                     DropdownMenuItem(
                       value: ThemeMode.light,
-                      child: Text('Sáng'),
+                      child: Text(l10n.settings_theme_light),
                     ),
                     DropdownMenuItem(
                       value: ThemeMode.dark,
-                      child: Text('Tối'),
+                      child: Text(l10n.settings_theme_dark),
                     ),
                   ],
                   onChanged: (mode) {
@@ -208,7 +169,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ),
               ListTile(
                 leading: const Icon(Icons.format_size),
-                title: const Text('Kích thước chữ'),
+                title: Text(l10n.settings_text_size),
                 subtitle: Slider(
                   value: textScale,
                   min: 0.9,
@@ -222,38 +183,32 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ],
           ),
           _buildSection(
-            title: 'Trung tâm trợ giúp',
+            title: l10n.settings_help_center,
             children: [
               ListTile(
                 leading: const Icon(Icons.question_answer_outlined),
-                title: const Text('FAQ'),
+                title: Text(l10n.settings_faq),
                 onTap: () => _openUrl('https://example.com/faq'),
               ),
               ListTile(
                 leading: const Icon(Icons.support_agent),
-                title: const Text('Liên hệ hỗ trợ'),
+                title: Text(l10n.settings_contact_support),
                 onTap: () => _openUrl('mailto:support@example.com'),
               ),
               ListTile(
                 leading: const Icon(Icons.bug_report_outlined),
-                title: const Text('Báo cáo sự cố / Gửi phản hồi'),
+                title: Text(l10n.settings_report_bug),
                 onTap: () => _openUrl('https://example.com/support'),
               ),
             ],
           ),
           _buildSection(
-            title: 'Tài khoản',
+            title: l10n.settings_account,
             children: [
               ListTile(
                 leading: const Icon(Icons.logout, color: Colors.red),
-                title: const Text('Đăng xuất'),
+                title: Text(l10n.settings_logout),
                 onTap: _confirmLogout,
-              ),
-              ListTile(
-                leading: const Icon(Icons.delete_outline, color: Colors.red),
-                title: const Text('Xóa tài khoản'),
-                subtitle: const Text('Tất cả dữ liệu sẽ bị xóa vĩnh viễn'),
-                onTap: _confirmDelete,
               ),
             ],
           ),
@@ -282,26 +237,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
-  void _showComingSoon() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Chức năng đang được phát triển.')),
-    );
-  }
-
   Future<void> _confirmLogout() async {
+    final l10n = context.l10n;
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Đăng xuất'),
-        content: const Text('Bạn chắc chắn muốn đăng xuất?'),
+        title: Text(l10n.settings_logout),
+        content: Text(l10n.settings_logout_confirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Hủy'),
+            child: Text(l10n.common_cancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Đăng xuất'),
+            child: Text(l10n.settings_logout),
           ),
         ],
       ),
@@ -314,30 +264,4 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       }
     }
   }
-
-  Future<void> _confirmDelete() async {
-    showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Xóa tài khoản'),
-        content: const Text(
-          'Tính năng đang trong quá trình phát triển. Vui lòng liên hệ hỗ trợ nếu bạn cần xóa tài khoản.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Đóng'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _openUrl('mailto:support@example.com');
-            },
-            child: const Text('Liên hệ hỗ trợ'),
-          ),
-        ],
-      ),
-    );
-  }
 }
-

@@ -5,7 +5,7 @@ class AppConfig {
   // You can find your IP with: ipconfig (Windows) or ifconfig (Mac/Linux)
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://192.168.1.228:3000/api', // Android emulator
+    defaultValue: 'http://192.168.1.43:3000/api', // Android emulator
     // For physical device, change to: 'http://YOUR_IP:3000/api'
     // Example: 'http://192.168.1.100:3000/api'
   );
@@ -13,7 +13,7 @@ class AppConfig {
   // WebSocket URL
   static const String wsUrl = String.fromEnvironment(
     'WS_URL',
-    defaultValue: 'http://192.168.1.228:3000', // Android emulator
+    defaultValue: 'http://192.168.1.43:3000', // Android emulator
     // For physical device, change to: 'http://YOUR_IP:3000'
   );
 

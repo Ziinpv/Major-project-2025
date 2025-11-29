@@ -335,8 +335,14 @@ userSchema.methods.toPublicJSON = function() {
   if (!user.lifestyle) user.lifestyle = [];
   
   // Ensure required fields have values
-  if (!user.firstName) user.firstName = 'User';
-  if (user.lastName == null) user.lastName = '';
+  // Chỉ fallback về 'User' nếu firstName thực sự không có (null/undefined/empty)
+  // Không override nếu đã có giá trị hợp lệ từ database
+  if (!user.firstName || (typeof user.firstName === 'string' && user.firstName.trim().length === 0)) {
+    user.firstName = 'User';
+  }
+  if (user.lastName == null || user.lastName === undefined) {
+    user.lastName = '';
+  }
   if (!user.gender) user.gender = 'other';
   
   // Convert dates to ISO strings

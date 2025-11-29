@@ -18,13 +18,13 @@ import '../../presentation/screens/profile/edit_profile_screen.dart';
 import '../../data/providers/auth_provider.dart';
 
 class GoRouterRefreshStream extends ChangeNotifier {
-  GoRouterRefreshStream(Stream<dynamic> stream) {
+  GoRouterRefreshStream(Stream stream) {
     _subscription = stream.asBroadcastStream().listen((_) {
       notifyListeners();
     });
   }
 
-  late final StreamSubscription<dynamic> _subscription;
+  late final StreamSubscription _subscription;
 
   @override
   void dispose() {

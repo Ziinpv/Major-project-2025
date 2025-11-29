@@ -241,21 +241,26 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
 
       await userRepo.updateProfile(profileData);
 
-      // Cập nhật location
-      await userRepo.updateLocation(
+      // Cập nhật location - endpoint này sẽ tự động check và set isProfileComplete
+      final updatedUser = await userRepo.updateLocation(
         province: _selectedProvince!,
         city: _selectedCity!,
         address: cleanedAddress.isNotEmpty ? cleanedAddress : null,
         country: 'Vietnam',
       );
 
-      // Refresh user profile
-      await ref.read(authProvider.notifier).refreshUser();
+      // Update user locally với dữ liệu mới nhất từ backend (đã có isProfileComplete = true)
+      ref.read(authProvider.notifier).updateUserLocally(updatedUser);
+
+      // Đợi một chút để router có thời gian nhận được thay đổi từ stream
+      await Future.delayed(const Duration(milliseconds: 500));
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Hoàn tất thiết lập hồ sơ!')),
         );
+        // Router sẽ tự động redirect dựa trên isProfileComplete
+        // Nhưng chúng ta vẫn cần navigate để trigger redirect check
         context.go('/home');
       }
     } catch (e) {

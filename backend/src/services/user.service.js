@@ -364,7 +364,16 @@ class UserService {
       location.coordinates = coordinates;
     }
 
-    return await userRepository.update(userId, { location });
+    const updatedUser = await userRepository.update(userId, { location });
+    
+    // Re-check profile completeness after updating location
+    const isComplete = this.checkProfileComplete(updatedUser);
+    if (isComplete) {
+      updatedUser.isProfileComplete = true;
+      await updatedUser.save();
+    }
+    
+    return updatedUser;
   }
 }
 
