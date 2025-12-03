@@ -80,120 +80,59 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _loginWithGoogle() async {
+    if (!mounted) return;
     setState(() => _isLoading = true);
 
     try {
       debugPrint('=== GOOGLE LOGIN START ===');
-      final GoogleSignIn googleSignIn = GoogleSignIn();
-      
-      debugPrint('=== Requesting Google Sign In ===');
-      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
 
+      final googleUser = await GoogleSignIn().signIn();
       if (googleUser == null) {
-        debugPrint('=== User cancelled Google Sign In ===');
-        setState(() => _isLoading = false);
+        if (mounted) setState(() => _isLoading = false);
         return;
       }
 
-      debugPrint('=== Google user obtained: ${googleUser.email} ===');
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-      debugPrint('=== Google auth obtained ===');
-      
+      final googleAuth = await googleUser.authentication;
+
+      if (!mounted) return;
+
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-      debugPrint('=== Firebase credential created ===');
 
-      debugPrint('=== Signing in with Firebase credential ===');
-      final userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
-      debugPrint('=== Firebase sign in successful ===');
-      
-      // Test: Print Firebase user info
-      print("=== FIREBASE USER ===");
-      print("UID: ${userCredential.user?.uid}");
-      print("Email: ${userCredential.user?.email}");
-      print("Display Name: ${userCredential.user?.displayName}");
-      print("Photo URL: ${userCredential.user?.photoURL}");
-      debugPrint("=== FIREBASE USER UID: ${userCredential.user?.uid} ===");
-      
-      debugPrint('=== Getting Firebase ID token ===');
-      final token = await userCredential.user?.getIdToken();
-      debugPrint('=== Firebase token obtained, length: ${token?.length} ===');
-      print("=== FIREBASE TOKEN LENGTH: ${token?.length} ===");
+      final firebaseUser =
+      await FirebaseAuth.instance.signInWithCredential(credential);
 
-      if (token != null) {
-        try {
-          debugPrint('=== Calling authProvider.loginWithFirebase ===');
-          await ref.read(authProvider.notifier).loginWithFirebase(token);
-          if (mounted) {
-            debugPrint('=== Login successful, redirecting... ===');
-            // Router will handle redirect based on profile completion
-            context.go('/home');
-          }
-        } catch (e, stackTrace) {
-          debugPrint('=== Backend login error: $e ===');
-          debugPrint('=== Stack trace: $stackTrace ===');
-          if (mounted) {
-            String errorMessage = 'Không thể kết nối đến server. ';
-            if (e.toString().contains('SocketException') || 
-                e.toString().contains('Failed host lookup') ||
-                e.toString().contains('Connection refused')) {
-              errorMessage += 'Vui lòng kiểm tra:\n'
-                  '1. Backend server đang chạy (http://localhost:3000)\n'
-                  '2. Đã cấu hình đúng IP trong app_config.dart\n'
-                  '3. Emulator: dùng 10.0.2.2\n'
-                  '4. Thiết bị thật: dùng IP máy tính (ipconfig/ifconfig)';
-            } else {
-              errorMessage += e.toString();
-            }
-            
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(errorMessage),
-                duration: const Duration(seconds: 6),
-              ),
-            );
-          }
-        }
-      } else {
-        debugPrint('=== ERROR: Cannot get Firebase token ===');
-        throw Exception('Không thể lấy Firebase token');
+      if (!mounted) return;
+
+      final token = await firebaseUser.user?.getIdToken();
+
+      if (token == null) {
+        throw Exception("Cannot get Firebase token.");
       }
-    } catch (e, stackTrace) {
-      debugPrint('=== Google Login Exception: $e ===');
-      debugPrint('=== Stack trace: $stackTrace ===');
+
+      // 🌟 SAFE CALL RIVERPOD
+      await ref.read(authProvider.notifier).loginWithFirebase(token);
+
+      if (!mounted) return;
+
+      debugPrint("=== REDIRECTING TO HOME ===");
+      context.go("/home");
+    } catch (e, st) {
+      debugPrint("=== GOOGLE LOGIN ERROR: $e ===");
+      debugPrint("=== STACK: $st ===");
+
       if (mounted) {
-        String errorMessage = 'Đăng nhập với Google thất bại';
-        
-        if (e.toString().contains('sign_in_failed') || e.toString().contains('ApiException: 10')) {
-          errorMessage = 'Lỗi cấu hình Google Sign-In. Vui lòng kiểm tra:\n'
-              '1. Đã thêm SHA-1 fingerprint vào Firebase Console\n'
-              '2. Đã tải google-services.json mới\n'
-              '3. Đã enable Google Sign-In trong Firebase Authentication';
-        } else if (e.toString().contains('network_error')) {
-          errorMessage = 'Lỗi kết nối mạng. Vui lòng kiểm tra kết nối internet.';
-        } else if (e.toString().contains('sign_in_canceled')) {
-          // User cancelled, don't show error
-          setState(() => _isLoading = false);
-          return;
-        } else {
-          errorMessage = 'Đăng nhập thất bại: ${e.toString()}';
-        }
-        
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(errorMessage),
-            duration: const Duration(seconds: 5),
-          ),
+          SnackBar(content: Text("Google Login Error: $e")),
         );
       }
     } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

@@ -7,3 +7,4 @@ build/
 coverage/
 .nyc_output/
 
+lib/core/config/app_config_local.dart

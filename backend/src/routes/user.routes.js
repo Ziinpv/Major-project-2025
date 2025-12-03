@@ -11,6 +11,7 @@ router.patch('/profile', userController.updateProfile.bind(userController));
 router.patch('/profile/photos', userController.updateProfilePhotos.bind(userController));
 router.get('/discovery', userController.getDiscovery.bind(userController));
 router.put('/location', userController.updateLocation.bind(userController));
+router.delete("/delete/:uid", userController.deleteAccount.bind(userController));
+
 
 module.exports = router;
-

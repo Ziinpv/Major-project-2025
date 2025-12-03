@@ -21,82 +21,113 @@ const preferenceRoutes = require('./routes/preference.routes');
 const deviceRoutes = require('./routes/device.routes');
 const uploadRoutes = require('./routes/upload.routes');
 const reportRoutes = require('./routes/report.routes');
+
 const { setupSocket } = require('./websocket/socket');
 
 const app = express();
 const server = http.createServer(app);
 
-// Initialize Socket.IO
+/**************************************
+ * 🔥 FIX 1 — Socket.IO cors mở rộng
+ *************************************/
 const io = new Server(server, {
   cors: {
-    origin: process.env.CORS_ORIGIN || '*',
-    methods: ['GET', 'POST'],
+    origin: "*",
+    methods: ["GET", "POST"],
     credentials: true
   }
 });
 
-// Initialize Firebase Admin
+/**************************************
+ * 🔥 FIX 2 — Firebase Admin init
+ *************************************/
 initializeFirebase();
 
-// Middleware
+/**************************************
+ * Middleware
+ *************************************/
 app.use(helmet());
 app.use(compression());
 app.use(requestLogger);
+
+/**************************************
+ * 🔥 FIX 3 — Mở full CORS cho Flutter
+ *************************************/
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || '*',
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   credentials: true
 }));
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Rate limiting
+/**************************************
+ * Body parser
+ *************************************/
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
+/**************************************
+ * Rate Limiting
+ *************************************/
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
+  windowMs: 15 * 60 * 1000,
+  max: 200
 });
-app.use('/api/', limiter);
+app.use("/api/", limiter);
 
-// Health check
-const healthHandler = (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-};
-app.get('/health', healthHandler);
-app.get('/api/health', healthHandler);
+/**************************************
+ * Health Check
+ *************************************/
+app.get("/health", (req, res) => {
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
+});
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
+});
 
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/discover', discoverRoutes);
-app.use('/api/swipes', swipeRoutes);
-app.use('/api/matches', matchRoutes);
-app.use('/api/chat', chatRoutes);
-app.use('/api/preferences', preferenceRoutes);
-app.use('/api/devices', deviceRoutes);
-app.use('/api/upload', uploadRoutes);
-app.use('/api/reports', reportRoutes);
+/**************************************
+ * Routes
+ *************************************/
+app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/discover", discoverRoutes);
+app.use("/api/swipes", swipeRoutes);
+app.use("/api/matches", matchRoutes);
+app.use("/api/chat", chatRoutes);
+app.use("/api/preferences", preferenceRoutes);
+app.use("/api/devices", deviceRoutes);
+app.use("/api/upload", uploadRoutes);
+app.use("/api/reports", reportRoutes);
 
-// Initialize Socket.IO handlers with logging
+/**************************************
+ * Socket.IO Setup
+ *************************************/
 setupSocket(io);
 
-// Error handling
+/**************************************
+ * Error Handler
+ *************************************/
 app.use(errorHandler);
 
-// Database connection
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
+/**************************************
+ * Database & Server Start
+ *************************************/
+mongoose.connect(process.env.MONGODB_URI, {})
   .then(() => {
-    console.log('✅ MongoDB connected');
+    console.log("✅ MongoDB connected");
+
     const PORT = process.env.PORT || 3000;
-    server.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
+
+    /*****************************************
+     * 🔥 FIX 4 — SERVER LISTEN 0.0.0.0
+     * BẮT BUỘC để emulator truy cập được
+     ****************************************/
+    server.listen(PORT, "0.0.0.0", () => {
+      console.log(`🚀 Server running on 0.0.0.0:${PORT}`);
     });
   })
   .catch((error) => {
-    console.error('❌ MongoDB connection error:', error);
+    console.error("❌ MongoDB connection error:", error);
     process.exit(1);
   });
 
 module.exports = { app, server, io };
-

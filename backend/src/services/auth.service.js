@@ -96,7 +96,7 @@ class AuthService {
 
   async loginWithFirebase(firebaseToken) {
     const firebaseUser = await verifyFirebaseToken(firebaseToken);
-    
+
     let user = await userRepository.findByFirebaseUid(firebaseUser.uid);
 
     if (!user) {
@@ -105,7 +105,7 @@ class AuthService {
       // User will need to complete profile setup later
       const defaultDateOfBirth = new Date();
       defaultDateOfBirth.setFullYear(defaultDateOfBirth.getFullYear() - 18); // Default to 18 years old
-      
+
       // Parse name from Firebase user
       const nameParts = firebaseUser.name?.split(' ') || [];
       const firstName = nameParts.length > 0 ? nameParts[0] : 'User';

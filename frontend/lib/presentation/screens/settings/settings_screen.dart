@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../core/extensions/localization_extension.dart';
 import '../../../core/providers/app_theme_provider.dart';
@@ -87,6 +88,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          // ------------ Ứng dụng ------------
           _buildSection(
             title: l10n.settings_app_info,
             children: [
@@ -100,20 +102,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   _serverOk == null
                       ? Icons.help_outline
                       : _serverOk == true
-                          ? Icons.check_circle
-                          : Icons.error_outline,
+                      ? Icons.check_circle
+                      : Icons.error_outline,
                   color: _serverOk == true
                       ? Colors.green
                       : _serverOk == false
-                          ? Colors.red
-                          : null,
+                      ? Colors.red
+                      : null,
                 ),
                 title: Text(l10n.settings_server_status),
                 subtitle: Text(_checkingServer
                     ? l10n.settings_checking
                     : _serverOk == true
-                        ? l10n.settings_server_ok
-                        : l10n.settings_server_error),
+                    ? l10n.settings_server_ok
+                    : l10n.settings_server_error),
                 trailing: IconButton(
                   icon: const Icon(Icons.refresh),
                   onPressed: _checkingServer ? null : _checkServer,
@@ -121,6 +123,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ),
             ],
           ),
+
+          // ------------ UI & theme ------------
           _buildSection(
             title: l10n.settings_language_ui,
             children: [
@@ -130,8 +134,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 trailing: DropdownButton<String>(
                   value: language,
                   items: [
-                    DropdownMenuItem(value: 'vi', child: Text(l10n.settings_language_vietnamese)),
-                    DropdownMenuItem(value: 'en', child: Text(l10n.settings_language_english)),
+                    DropdownMenuItem(
+                        value: 'vi',
+                        child: Text(l10n.settings_language_vietnamese)),
+                    DropdownMenuItem(
+                        value: 'en',
+                        child: Text(l10n.settings_language_english)),
                   ],
                   onChanged: (value) {
                     if (value != null) {
@@ -182,6 +190,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ),
             ],
           ),
+
+          // ------------ Hỗ trợ ------------
           _buildSection(
             title: l10n.settings_help_center,
             children: [
@@ -202,9 +212,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ),
             ],
           ),
+
+          // ------------ Tài khoản ------------
           _buildSection(
             title: l10n.settings_account,
             children: [
+              ListTile(
+                leading: const Icon(Icons.lock_reset),
+                title: Text(l10n.settings_change_password),
+                onTap: _showChangePasswordDialog,
+              ),
+              ListTile(
+                leading: const Icon(Icons.delete_forever, color: Colors.red),
+                title: Text(l10n.settings_delete_account),
+                onTap: _confirmDeleteAccount,
+              ),
               ListTile(
                 leading: const Icon(Icons.logout, color: Colors.red),
                 title: Text(l10n.settings_logout),
@@ -225,10 +247,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              title,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
+            Text(title,
+                style:
+                const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             ...children,
           ],
@@ -237,30 +258,155 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
+  // -------------------------------------------------------
+  // LOGOUT
+  // -------------------------------------------------------
   Future<void> _confirmLogout() async {
     final l10n = context.l10n;
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (_) => AlertDialog(
         title: Text(l10n.settings_logout),
         content: Text(l10n.settings_logout_confirm),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(l10n.common_cancel),
-          ),
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(l10n.common_cancel)),
           TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text(l10n.settings_logout),
-          ),
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(l10n.settings_logout)),
         ],
       ),
     );
 
     if (confirm == true) {
       await ref.read(authProvider.notifier).logout();
-      if (mounted) {
+      if (!mounted) return;
+      context.go('/auth/login');
+    }
+  }
+
+  // -------------------------------------------------------
+  // ĐỔI MẬT KHẨU
+  // -------------------------------------------------------
+  Future<void> _showChangePasswordDialog() async {
+    final oldPass = TextEditingController();
+    final newPass = TextEditingController();
+    final l10n = context.l10n;
+
+    final user = FirebaseAuth.instance.currentUser!;
+    final provider = user.providerData.first.providerId;
+
+    if (provider == "google.com") {
+      // không đổi mật khẩu với Google login
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Google account cannot change password.")),
+      );
+      return;
+    }
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(l10n.settings_change_password),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: oldPass,
+              obscureText: true,
+              decoration: InputDecoration(
+                labelText: l10n.settings_old_password,
+              ),
+            ),
+            TextField(
+              controller: newPass,
+              obscureText: true,
+              decoration: InputDecoration(
+                labelText: l10n.settings_new_password,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(l10n.common_cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(l10n.common_confirm),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      final success = await ref.read(authProvider.notifier)
+          .changePassword(oldPass.text.trim(), newPass.text.trim());
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(success
+                ? l10n.settings_change_password_success
+                : l10n.settings_change_password_fail)),
+      );
+    }
+  }
+
+  // -------------------------------------------------------
+  // XÓA TÀI KHOẢN
+  // -------------------------------------------------------
+  Future<void> _confirmDeleteAccount() async {
+    final passwordCtrl = TextEditingController();
+    final l10n = context.l10n;
+
+    final user = FirebaseAuth.instance.currentUser!;
+    final provider = user.providerData.first.providerId;
+
+    final bool? confirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(l10n.settings_delete_account),
+        content: provider == "password"
+            ? Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(l10n.settings_delete_account_confirm),
+            const SizedBox(height: 12),
+            TextField(
+              controller: passwordCtrl,
+              obscureText: true,
+              decoration:
+              InputDecoration(labelText: l10n.settings_enter_password),
+            ),
+          ],
+        )
+            : Text(
+            "Bạn đăng nhập bằng Google. Bạn sẽ được yêu cầu xác thực Google để tiếp tục."),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(l10n.common_cancel)),
+          TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(l10n.settings_delete_account)),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      final success = await ref
+          .read(authProvider.notifier)
+          .deleteAccount(passwordCtrl.text.trim());
+
+      if (success) {
+        if (!mounted) return;
         context.go('/auth/login');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.settings_delete_account_fail)),
+        );
       }
     }
   }

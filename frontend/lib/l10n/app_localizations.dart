@@ -979,6 +979,60 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Đã có tài khoản? Đăng nhập'**
   String get onboarding_login;
+
+  /// No description provided for @settings_change_password.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đổi mật khẩu'**
+  String get settings_change_password;
+
+  /// No description provided for @settings_old_password.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mật khẩu cũ'**
+  String get settings_old_password;
+
+  /// No description provided for @settings_new_password.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mật khẩu mới'**
+  String get settings_new_password;
+
+  /// No description provided for @settings_change_password_success.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đổi mật khẩu thành công'**
+  String get settings_change_password_success;
+
+  /// No description provided for @settings_change_password_fail.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đổi mật khẩu thất bại'**
+  String get settings_change_password_fail;
+
+  /// No description provided for @settings_delete_account.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xóa tài khoản'**
+  String get settings_delete_account;
+
+  /// No description provided for @settings_delete_account_confirm.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn có chắc muốn xóa tài khoản?'**
+  String get settings_delete_account_confirm;
+
+  /// No description provided for @settings_enter_password.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhập mật khẩu'**
+  String get settings_enter_password;
+
+  /// No description provided for @settings_delete_account_fail.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xóa tài khoản thất bại'**
+  String get settings_delete_account_fail;
 }
 
 class _AppLocalizationsDelegate

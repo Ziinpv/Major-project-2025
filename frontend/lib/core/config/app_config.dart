@@ -1,26 +1,47 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:io' show Platform;
 class AppConfig {
-  // Backend API
-  // For Android emulator, use 10.0.2.2 instead of localhost
-  // For physical device, use your computer's IP address (e.g., 192.168.1.100)
-  // You can find your IP with: ipconfig (Windows) or ifconfig (Mac/Linux)
-  static const String baseUrl = String.fromEnvironment(
-    'API_BASE_URL',
-    defaultValue: 'http://192.168.1.43:3000/api', // Android emulator
-    // For physical device, change to: 'http://YOUR_IP:3000/api'
-    // Example: 'http://192.168.1.100:3000/api'
-  );
+  static String get baseUrl {
+    // WEB
+    if (kIsWeb) {
+      return "http://localhost:3000/api"; // hoặc server thật nếu deploy
+    }
 
-  // WebSocket URL
-  static const String wsUrl = String.fromEnvironment(
-    'WS_URL',
-    defaultValue: 'http://192.168.1.43:3000', // Android emulator
-    // For physical device, change to: 'http://YOUR_IP:3000'
-  );
+    // ANDROID PHYSICAL DEVICE via USB (use adb reverse)
+    if (Platform.isAndroid) {
+      // Nếu dùng adb reverse
+      return "http://localhost:3000/api";
 
-  // App Version
+      // Nếu dùng emulator -> bạn bè dùng emulator sẽ sửa dòng này:
+      // return "http://10.0.2.2:3000/api";
+    }
+
+    // iOS Simulator
+    if (Platform.isIOS) {
+      return "http://localhost:3000/api";
+    }
+
+    // Default fallback
+    return "http://localhost:3000/api";
+  }
+
+  static String get wsUrl {
+    if (kIsWeb) {
+      return "ws://localhost:3000";
+    }
+
+    if (Platform.isAndroid) {
+      return "ws://localhost:3000";
+    }
+
+    if (Platform.isIOS) {
+      return "ws://localhost:3000";
+    }
+
+    return "ws://localhost:3000";
+  }
+
   static const String appVersion = '1.0.0';
-
-  // API Timeout
   static const Duration apiTimeout = Duration(seconds: 30);
 }
-

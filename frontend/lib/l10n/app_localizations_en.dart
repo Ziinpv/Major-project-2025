@@ -461,4 +461,33 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboarding_login => 'Already have an account? Login';
+
+  @override
+  String get settings_change_password => 'Change Password';
+
+  @override
+  String get settings_old_password => 'Old Password';
+
+  @override
+  String get settings_new_password => 'New Password';
+
+  @override
+  String get settings_change_password_success =>
+      'Password changed successfully';
+
+  @override
+  String get settings_change_password_fail => 'Failed to change password';
+
+  @override
+  String get settings_delete_account => 'Delete Account';
+
+  @override
+  String get settings_delete_account_confirm =>
+      'Are you sure you want to delete your account?';
+
+  @override
+  String get settings_enter_password => 'Enter your password';
+
+  @override
+  String get settings_delete_account_fail => 'Failed to delete your account';
 }

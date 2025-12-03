@@ -66,6 +66,12 @@ class MatchRepository {
       }
     );
   }
+  async deleteByUser(userId) {
+    await Match.deleteMany({
+      users: userId
+    });
+  }
+
 }
 
 module.exports = new MatchRepository();

@@ -1,6 +1,8 @@
 const userRepository = require('../repositories/user.repository');
 const swipeRepository = require('../repositories/swipe.repository');
 const recommendationService = require('./recommendation.service');
+const matchRepository = require('../repositories/match.repository');
+const chatRepository = require('../repositories/chat.repository');
 const { getCoordinates } = require('../utils/vietnam_coordinates');
 const {
   INTEREST_OPTIONS,
@@ -365,15 +367,40 @@ class UserService {
     }
 
     const updatedUser = await userRepository.update(userId, { location });
-    
+
     // Re-check profile completeness after updating location
     const isComplete = this.checkProfileComplete(updatedUser);
     if (isComplete) {
       updatedUser.isProfileComplete = true;
       await updatedUser.save();
     }
-    
+
     return updatedUser;
+  }
+
+  async deleteAccount(uid) {
+    console.log("🔥 deleteAccount START:", uid);
+
+    // 1 — Xoá swipes
+    if (swipeRepository?.deleteByUser) {
+      await swipeRepository.deleteByUser(uid);
+    }
+
+    // 2 — Xoá matches
+    if (matchRepository?.deleteByUser) {
+      await matchRepository.deleteByUser(uid);
+    }
+
+    // 3 — Xoá chatrooms + messages
+    if (chatRepository?.deleteByUser) {
+      await chatRepository.deleteByUser(uid);
+    }
+
+    // 4 — Xoá user cuối cùng
+    await userRepository.delete(uid);
+
+    console.log("🔥 deleteAccount DONE");
+    return true;
   }
 }
 

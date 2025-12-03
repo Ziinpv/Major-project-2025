@@ -460,4 +460,32 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get onboarding_login => 'Đã có tài khoản? Đăng nhập';
+
+  @override
+  String get settings_change_password => 'Đổi mật khẩu';
+
+  @override
+  String get settings_old_password => 'Mật khẩu cũ';
+
+  @override
+  String get settings_new_password => 'Mật khẩu mới';
+
+  @override
+  String get settings_change_password_success => 'Đổi mật khẩu thành công';
+
+  @override
+  String get settings_change_password_fail => 'Đổi mật khẩu thất bại';
+
+  @override
+  String get settings_delete_account => 'Xóa tài khoản';
+
+  @override
+  String get settings_delete_account_confirm =>
+      'Bạn có chắc muốn xóa tài khoản?';
+
+  @override
+  String get settings_enter_password => 'Nhập mật khẩu';
+
+  @override
+  String get settings_delete_account_fail => 'Xóa tài khoản thất bại';
 }

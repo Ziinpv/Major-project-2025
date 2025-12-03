@@ -151,6 +151,18 @@ class ChatRepository {
     // This would typically be handled via WebSocket, but we can store it here if needed
     // For now, we'll handle typing indicators via WebSocket only
   }
+  async deleteByUser(userId) {
+    const rooms = await ChatRoom.find({ participants: userId });
+
+    const roomIds = rooms.map(r => r._id);
+
+    // Xóa messages
+    await Message.deleteMany({ chatRoom: { $in: roomIds } });
+
+    // Xóa rooms
+    await ChatRoom.deleteMany({ _id: { $in: roomIds } });
+  }
+
 }
 
 module.exports = new ChatRepository();

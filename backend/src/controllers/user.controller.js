@@ -71,6 +71,22 @@ class UserController {
       next(error);
     }
   }
+
+  async deleteAccount(req, res, next) {
+    try {
+      const userId = req.userId;   // lấy từ JWT
+
+      await userService.deleteAccount(userId);
+
+      return res.json({
+        success: true,
+        message: "Account deleted successfully"
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
 }
 
 module.exports = new UserController();

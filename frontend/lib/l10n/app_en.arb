@@ -176,6 +176,17 @@
   "onboarding_welcome": "Welcome to Matcha",
   "onboarding_subtitle": "Find meaningful connections",
   "onboarding_get_started": "Get Started",
-  "onboarding_login": "Already have an account? Login"
+  "onboarding_login": "Already have an account? Login",
+
+  "settings_change_password": "Change Password",
+  "settings_old_password": "Old Password",
+  "settings_new_password": "New Password",
+  "settings_change_password_success": "Password changed successfully",
+  "settings_change_password_fail": "Failed to change password",
+
+  "settings_delete_account": "Delete Account",
+  "settings_delete_account_confirm": "Are you sure you want to delete your account?",
+  "settings_enter_password": "Enter your password",
+  "settings_delete_account_fail": "Failed to delete your account"
 }
 

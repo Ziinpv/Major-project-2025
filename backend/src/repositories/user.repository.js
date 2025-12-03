@@ -5,22 +5,33 @@ const {
 } = require('../utils/constants');
 
 class UserRepository {
+
+  // Tạo user mới
   async create(userData) {
     return await User.create(userData);
   }
 
+  // Tìm user theo MongoDB _id
   async findById(userId) {
     return await User.findById(userId);
   }
 
+  // 🔥 Tìm user theo email
   async findByEmail(email) {
     return await User.findOne({ email: email.toLowerCase() });
   }
 
+  // 🔥 Tìm user bằng firebaseUid (dùng cho login & delete)
   async findByFirebaseUid(firebaseUid) {
     return await User.findOne({ firebaseUid });
   }
 
+  // 🔥 Xóa user bằng firebaseUid (đây là hàm bạn thiếu)
+  async deleteByFirebaseUid(firebaseUid) {
+    return await User.deleteOne({ firebaseUid });
+  }
+
+  // Cập nhật user chung
   async update(userId, updateData) {
     return await User.findByIdAndUpdate(
       userId,
@@ -28,6 +39,8 @@ class UserRepository {
       { new: true, runValidators: true }
     );
   }
+
+  // ========== DISCOVERY + FILTER + LOCATION ==============
 
   async findNearbyUsers(userId, location = {}, maxDistance, filters = {}) {
     const user = await User.findById(userId);
@@ -72,7 +85,6 @@ class UserRepository {
       isProfileComplete: true
     };
 
-    // Exclude already swiped users
     if (excludeIds.length > 0) {
       baseQuery._id = { $ne: userId, $nin: excludeIds };
     }
@@ -85,7 +97,7 @@ class UserRepository {
       if (user.preferences?.ageRange) {
         const today = new Date();
         const minBirthDate = new Date(today.getFullYear() - user.preferences.ageRange.max, today.getMonth(), today.getDate());
-        const maxBirthDate = new Date(today.getFullYear() - user.preferences.ageRange.min, today.getMonth(), today.getDate());
+        const maxBirthDate = new Date(today.getFullYear() - user.preferences.ageRange.min, today.getMonth(), today.getDate(), 23, 59, 59, 999);
         query.dateOfBirth = { $gte: minBirthDate, $lte: maxBirthDate };
       }
     };
@@ -105,7 +117,6 @@ class UserRepository {
 
     let matches = await User.find(withLocationQuery).limit(50);
 
-    // Fallback: if no users in same location, broaden search
     if (matches.length === 0) {
       const fallbackQuery = { ...baseQuery };
       applyPreferenceFilters(fallbackQuery);
@@ -133,18 +144,16 @@ class UserRepository {
     const ageMax = filters.ageMax || currentUser.preferences?.ageRange?.max || DEFAULT_PREFERENCES.MAX_AGE;
     if (ageMin || ageMax) {
       const today = new Date();
-      // minBirthDate: oldest person (ageMax years old) - set to start of day
       const minBirthDate = new Date(today.getFullYear() - ageMax, today.getMonth(), today.getDate());
-      // maxBirthDate: youngest person (ageMin years old) - set to end of day to include all times
       const maxBirthDate = new Date(today.getFullYear() - ageMin, today.getMonth(), today.getDate(), 23, 59, 59, 999);
       query.dateOfBirth = { $gte: minBirthDate, $lte: maxBirthDate };
     }
 
-    if (filters.lifestyle && filters.lifestyle.length > 0) {
+    if (filters.lifestyle?.length > 0) {
       query.lifestyle = { $in: filters.lifestyle };
     }
 
-    if (filters.interests && filters.interests.length > 0) {
+    if (filters.interests?.length > 0) {
       query.interests = { $in: filters.interests };
     }
 
@@ -155,42 +164,27 @@ class UserRepository {
 
     let dbQuery = User.find(query);
 
-    // Determine maxDistance: if explicitly provided in filters, use it; otherwise use user preferences or default
-    // If maxDistance is very large (> 1000km), treat it as "no distance filter"
-    const maxDistance = filters.maxDistance !== undefined && filters.maxDistance !== null
-      ? Number(filters.maxDistance)
-      : (currentUser.preferences?.maxDistance || DEFAULT_PREFERENCES.MAX_DISTANCE);
+    const maxDistance = filters.maxDistance ?? currentUser.preferences?.maxDistance ?? DEFAULT_PREFERENCES.MAX_DISTANCE;
 
     const coords = currentUser.location?.coordinates;
     const hasValidCoordinates =
       Array.isArray(coords) &&
       coords.length === 2 &&
-      coords.every(
-        (value) =>
-          value !== null &&
-          value !== undefined &&
-          !Number.isNaN(Number(value))
-      );
+      coords.every(x => x !== null && x !== undefined && !isNaN(Number(x)));
 
-    // Only apply $near query if:
-    // 1. User has valid coordinates
-    // 2. maxDistance is set and reasonable (< 1000km, or if > 1000km, it means "no limit" so skip $near)
-    // 3. maxDistance is not null/undefined
-    const shouldApplyDistanceFilter = hasValidCoordinates && 
-      maxDistance && 
-      maxDistance > 0 && 
-      maxDistance < 1000; // If >= 1000km, treat as "no distance limit"
+    const shouldApplyDistanceFilter =
+      hasValidCoordinates &&
+      maxDistance &&
+      maxDistance > 0 &&
+      maxDistance < 1000;
 
     if (shouldApplyDistanceFilter) {
-      const [lng, lat] = coords.map((v) => Number(v));
+      const [lng, lat] = coords.map(Number);
       dbQuery = dbQuery.where({
         'location.coordinates': {
           $near: {
-            $geometry: {
-              type: 'Point',
-              coordinates: [lng, lat]
-            },
-            $maxDistance: maxDistance * 1000 // km -> m
+            $geometry: { type: 'Point', coordinates: [lng, lat] },
+            $maxDistance: maxDistance * 1000
           }
         }
       });
@@ -214,7 +208,10 @@ class UserRepository {
       { new: true }
     );
   }
+  async delete(userId) {
+    await User.findByIdAndDelete(userId);
+  }
+
 }
 
 module.exports = new UserRepository();
-
