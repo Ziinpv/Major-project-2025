@@ -548,6 +548,12 @@ abstract class AppLocalizations {
   /// **'Sở thích'**
   String get profile_interests;
 
+  /// No description provided for @profile_lifestyle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Phong cách sống'**
+  String get profile_lifestyle;
+
   /// No description provided for @profile_edit_button.
   ///
   /// In vi, this message translates to:
@@ -979,6 +985,210 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Đã có tài khoản? Đăng nhập'**
   String get onboarding_login;
+
+  /// No description provided for @swipe_liked.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn đã thích {name}'**
+  String swipe_liked(String name);
+
+  /// No description provided for @swipe_superliked.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn đã Super Like {name}'**
+  String swipe_superliked(String name);
+
+  /// No description provided for @swipe_passed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã bỏ qua {name}'**
+  String swipe_passed(String name);
+
+  /// No description provided for @swipe_action_failed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không thể gửi thao tác'**
+  String get swipe_action_failed;
+
+  /// No description provided for @swipe_match_title.
+  ///
+  /// In vi, this message translates to:
+  /// **'It\'s a match!'**
+  String get swipe_match_title;
+
+  /// No description provided for @swipe_match_message.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn và {name} đã thích nhau. Hãy bắt đầu trò chuyện!'**
+  String swipe_match_message(String name);
+
+  /// No description provided for @swipe_match_time.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thời gian match: {time}'**
+  String swipe_match_time(String time);
+
+  /// No description provided for @swipe_chat_now.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhắn tin ngay'**
+  String get swipe_chat_now;
+
+  /// No description provided for @discovery_sort.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sắp xếp'**
+  String get discovery_sort;
+
+  /// No description provided for @discovery_sort_best_match.
+  ///
+  /// In vi, this message translates to:
+  /// **'Phù hợp nhất'**
+  String get discovery_sort_best_match;
+
+  /// No description provided for @discovery_sort_newest.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mới nhất'**
+  String get discovery_sort_newest;
+
+  /// No description provided for @discovery_load_error.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không thể tải danh sách người dùng'**
+  String get discovery_load_error;
+
+  /// No description provided for @discovery_empty.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hiện chưa có gợi ý nào.\nHãy thử lại sau hoặc cập nhật bộ lọc.'**
+  String get discovery_empty;
+
+  /// No description provided for @discovery_reload.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tải lại'**
+  String get discovery_reload;
+
+  /// No description provided for @discovery_online_only.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chỉ hiển thị người đang online'**
+  String get discovery_online_only;
+
+  /// No description provided for @discovery_filters_title.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bộ lọc đề xuất'**
+  String get discovery_filters_title;
+
+  /// No description provided for @discovery_filters_age_range.
+  ///
+  /// In vi, this message translates to:
+  /// **'Độ tuổi mong muốn'**
+  String get discovery_filters_age_range;
+
+  /// No description provided for @discovery_filters_gender_show.
+  ///
+  /// In vi, this message translates to:
+  /// **'Giới tính hiển thị'**
+  String get discovery_filters_gender_show;
+
+  /// No description provided for @discovery_filters_lifestyle_match.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lifestyle phù hợp'**
+  String get discovery_filters_lifestyle_match;
+
+  /// No description provided for @discovery_filters_interests_common.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sở thích chung (tối đa 5)'**
+  String get discovery_filters_interests_common;
+
+  /// No description provided for @discovery_filters_distance_max.
+  ///
+  /// In vi, this message translates to:
+  /// **'Khoảng cách tối đa (km)'**
+  String get discovery_filters_distance_max;
+
+  /// No description provided for @discovery_filters_no_distance_limit.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không giới hạn khoảng cách'**
+  String get discovery_filters_no_distance_limit;
+
+  /// No description provided for @discovery_filters_no_distance_subtitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hiển thị tất cả người dùng bất kể vị trí'**
+  String get discovery_filters_no_distance_subtitle;
+
+  /// No description provided for @discovery_filters_apply.
+  ///
+  /// In vi, this message translates to:
+  /// **'Áp dụng bộ lọc'**
+  String get discovery_filters_apply;
+
+  /// No description provided for @discovery_filters_gender_required.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn ít nhất một giới tính hiển thị'**
+  String get discovery_filters_gender_required;
+
+  /// No description provided for @discovery_filters_interests_limit.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chỉ chọn tối đa 5 sở thích'**
+  String get discovery_filters_interests_limit;
+
+  /// No description provided for @discovery_filters_no_limit.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không giới hạn'**
+  String get discovery_filters_no_limit;
+
+  /// No description provided for @matches_empty.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa có match nào'**
+  String get matches_empty;
+
+  /// No description provided for @matches_load_error.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không thể tải danh sách match'**
+  String get matches_load_error;
+
+  /// No description provided for @matches_chat_error.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không thể mở chat'**
+  String get matches_chat_error;
+
+  /// No description provided for @matches_unknown_user.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không xác định'**
+  String get matches_unknown_user;
+
+  /// No description provided for @chat_list_empty.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa có cuộc trò chuyện nào'**
+  String get chat_list_empty;
+
+  /// No description provided for @chat_list_load_error.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không thể tải danh sách chat'**
+  String get chat_list_load_error;
+
+  /// No description provided for @chat_room_other_user_unknown.
+  ///
+  /// In vi, this message translates to:
+  /// **'Người dùng không xác định'**
+  String get chat_room_other_user_unknown;
 }
 
 class _AppLocalizationsDelegate

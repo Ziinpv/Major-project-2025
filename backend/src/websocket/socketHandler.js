@@ -58,6 +58,19 @@ const initializeSocketIO = (io) => {
     // Join user's personal room
     socket.join(`user:${socket.userId}`);
 
+    // Send list of currently online users to the newly connected user
+    const onlineUserIds = Array.from(connectedUsers.keys()).filter(id => id !== socket.userId);
+    socket.emit('online-users-list', {
+      userIds: onlineUserIds,
+      timestamp: new Date().toISOString()
+    });
+
+    // Notify all OTHER connected users that this user is now online
+    socket.broadcast.emit('user-online', {
+      userId: socket.userId,
+      timestamp: new Date().toISOString()
+    });
+
     // Join all user's chat rooms
     socket.on('join-chat-rooms', async () => {
       try {
@@ -153,6 +166,13 @@ const initializeSocketIO = (io) => {
     // Disconnect
     socket.on('disconnect', () => {
       console.log(`❌ User disconnected: ${socket.userId}`);
+      
+      // Notify all connected users that this user is now offline
+      socket.broadcast.emit('user-offline', {
+        userId: socket.userId,
+        timestamp: new Date().toISOString()
+      });
+      
       connectedUsers.delete(socket.userId);
     });
   });

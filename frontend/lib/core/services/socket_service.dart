@@ -25,16 +25,20 @@ class SocketService {
     );
 
     _socket!.onConnect((_) {
-      print('Socket connected');
+      print('✅ Socket connected at ${DateTime.now().toLocal()}');
       _socket!.emit('join-chat-rooms');
     });
 
     _socket!.onDisconnect((_) {
-      print('Socket disconnected');
+      print('❌ Socket disconnected at ${DateTime.now().toLocal()}');
     });
 
     _socket!.onError((error) {
-      print('Socket error: $error');
+      print('⚠️ Socket error: $error');
+    });
+
+    _socket!.onConnectError((error) {
+      print('⚠️ Socket connect error: $error');
     });
   }
 

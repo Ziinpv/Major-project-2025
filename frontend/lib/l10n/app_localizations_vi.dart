@@ -241,6 +241,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get profile_interests => 'Sở thích';
 
   @override
+  String get profile_lifestyle => 'Phong cách sống';
+
+  @override
   String get profile_edit_button => 'Chỉnh sửa hồ sơ';
 
   @override
@@ -460,4 +463,120 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get onboarding_login => 'Đã có tài khoản? Đăng nhập';
+
+  @override
+  String swipe_liked(String name) {
+    return 'Bạn đã thích $name';
+  }
+
+  @override
+  String swipe_superliked(String name) {
+    return 'Bạn đã Super Like $name';
+  }
+
+  @override
+  String swipe_passed(String name) {
+    return 'Đã bỏ qua $name';
+  }
+
+  @override
+  String get swipe_action_failed => 'Không thể gửi thao tác';
+
+  @override
+  String get swipe_match_title => 'It\'s a match!';
+
+  @override
+  String swipe_match_message(String name) {
+    return 'Bạn và $name đã thích nhau. Hãy bắt đầu trò chuyện!';
+  }
+
+  @override
+  String swipe_match_time(String time) {
+    return 'Thời gian match: $time';
+  }
+
+  @override
+  String get swipe_chat_now => 'Nhắn tin ngay';
+
+  @override
+  String get discovery_sort => 'Sắp xếp';
+
+  @override
+  String get discovery_sort_best_match => 'Phù hợp nhất';
+
+  @override
+  String get discovery_sort_newest => 'Mới nhất';
+
+  @override
+  String get discovery_load_error => 'Không thể tải danh sách người dùng';
+
+  @override
+  String get discovery_empty =>
+      'Hiện chưa có gợi ý nào.\nHãy thử lại sau hoặc cập nhật bộ lọc.';
+
+  @override
+  String get discovery_reload => 'Tải lại';
+
+  @override
+  String get discovery_online_only => 'Chỉ hiển thị người đang online';
+
+  @override
+  String get discovery_filters_title => 'Bộ lọc đề xuất';
+
+  @override
+  String get discovery_filters_age_range => 'Độ tuổi mong muốn';
+
+  @override
+  String get discovery_filters_gender_show => 'Giới tính hiển thị';
+
+  @override
+  String get discovery_filters_lifestyle_match => 'Lifestyle phù hợp';
+
+  @override
+  String get discovery_filters_interests_common => 'Sở thích chung (tối đa 5)';
+
+  @override
+  String get discovery_filters_distance_max => 'Khoảng cách tối đa (km)';
+
+  @override
+  String get discovery_filters_no_distance_limit =>
+      'Không giới hạn khoảng cách';
+
+  @override
+  String get discovery_filters_no_distance_subtitle =>
+      'Hiển thị tất cả người dùng bất kể vị trí';
+
+  @override
+  String get discovery_filters_apply => 'Áp dụng bộ lọc';
+
+  @override
+  String get discovery_filters_gender_required =>
+      'Chọn ít nhất một giới tính hiển thị';
+
+  @override
+  String get discovery_filters_interests_limit => 'Chỉ chọn tối đa 5 sở thích';
+
+  @override
+  String get discovery_filters_no_limit => 'Không giới hạn';
+
+  @override
+  String get matches_empty => 'Chưa có match nào';
+
+  @override
+  String get matches_load_error => 'Không thể tải danh sách match';
+
+  @override
+  String get matches_chat_error => 'Không thể mở chat';
+
+  @override
+  String get matches_unknown_user => 'Không xác định';
+
+  @override
+  String get chat_list_empty => 'Chưa có cuộc trò chuyện nào';
+
+  @override
+  String get chat_list_load_error => 'Không thể tải danh sách chat';
+
+  @override
+  String get chat_room_other_user_unknown => 'Người dùng không xác định';
 }

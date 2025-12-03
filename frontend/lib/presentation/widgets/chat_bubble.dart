@@ -13,6 +13,11 @@ class ChatBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final otherBubbleColor = isDarkMode ? Colors.grey[800] : Colors.grey[300];
+    final otherTextColor = isDarkMode ? Colors.white : Colors.black;
+    final otherTimeColor = isDarkMode ? Colors.grey[400] : Colors.black54;
+    
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
@@ -22,7 +27,7 @@ class ChatBubble extends StatelessWidget {
           maxWidth: MediaQuery.of(context).size.width * 0.7,
         ),
         decoration: BoxDecoration(
-          color: isMe ? const Color(0xFFE91E63) : Colors.grey[300],
+          color: isMe ? const Color(0xFFE91E63) : otherBubbleColor,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Column(
@@ -31,7 +36,7 @@ class ChatBubble extends StatelessWidget {
             Text(
               message.content,
               style: TextStyle(
-                color: isMe ? Colors.white : Colors.black,
+                color: isMe ? Colors.white : otherTextColor,
                 fontSize: 16,
               ),
             ),
@@ -42,7 +47,7 @@ class ChatBubble extends StatelessWidget {
                 Text(
                   '${message.createdAt.hour}:${message.createdAt.minute.toString().padLeft(2, '0')}',
                   style: TextStyle(
-                    color: isMe ? Colors.white70 : Colors.black54,
+                    color: isMe ? Colors.white70 : otherTimeColor,
                     fontSize: 12,
                   ),
                 ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/extensions/localization_extension.dart';
 import '../../../data/models/chat_room_model.dart';
 import '../../../data/models/discovery_filters.dart';
 import '../../../data/models/filter_option.dart';
@@ -108,14 +109,15 @@ class _DiscoveryScreenState extends ConsumerState<DiscoveryScreen> {
         }
         await _showMatchDialog(user, match: match, chatRoom: chatRoom);
       } else {
+        final l10n = context.l10n;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
               action == 'like'
-                  ? 'Bạn đã thích ${user.firstName}'
+                  ? l10n.swipe_liked(user.firstName)
                   : action == 'superlike'
-                      ? 'Bạn đã Super Like ${user.firstName}'
-                      : 'Đã bỏ qua ${user.firstName}',
+                      ? l10n.swipe_superliked(user.firstName)
+                      : l10n.swipe_passed(user.firstName),
             ),
             duration: const Duration(seconds: 2),
           ),
@@ -136,8 +138,9 @@ class _DiscoveryScreenState extends ConsumerState<DiscoveryScreen> {
       }
     } catch (e) {
       if (!mounted) return;
+      final l10n = context.l10n;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Không thể gửi thao tác: $e')),
+        SnackBar(content: Text('${l10n.swipe_action_failed}: $e')),
       );
     } finally {
       if (mounted) {
@@ -153,19 +156,20 @@ class _DiscoveryScreenState extends ConsumerState<DiscoveryScreen> {
     MatchModel? match,
     ChatRoomModel? chatRoom,
   }) async {
+    final l10n = context.l10n;
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('It\'s a match!'),
+        title: Text(l10n.swipe_match_title),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Bạn và ${user.firstName} đã thích nhau. Hãy bắt đầu trò chuyện!'),
+            Text(l10n.swipe_match_message(user.firstName)),
             if (match?.matchedAt != null) ...[
               const SizedBox(height: 8),
               Text(
-                'Thời gian match: ${match!.matchedAt}',
+                l10n.swipe_match_time(match!.matchedAt.toString()),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
@@ -178,12 +182,12 @@ class _DiscoveryScreenState extends ConsumerState<DiscoveryScreen> {
                 Navigator.of(context).pop();
                 context.push('/chat/${chatRoom.id}', extra: chatRoom);
               },
-              child: const Text('Nhắn tin ngay'),
+              child: Text(l10n.swipe_chat_now),
             ),
           ],
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Đóng'),
+            child: Text(l10n.common_close),
           ),
         ],
       ),
@@ -213,6 +217,7 @@ class _DiscoveryScreenState extends ConsumerState<DiscoveryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final filters = ref.watch(discoveryFiltersProvider);
     final profile = ref.watch(userProfileProvider).maybeWhen(
           data: (user) => user,
@@ -228,7 +233,7 @@ class _DiscoveryScreenState extends ConsumerState<DiscoveryScreen> {
 
     if (_errorMessage != null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Discover')),
+        appBar: AppBar(title: Text(l10n.discovery_title)),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(24.0),
@@ -238,13 +243,13 @@ class _DiscoveryScreenState extends ConsumerState<DiscoveryScreen> {
                 const Icon(Icons.error_outline, size: 48, color: Colors.red),
                 const SizedBox(height: 16),
                 Text(
-                  'Không thể tải danh sách người dùng.\n$_errorMessage',
+                  '${l10n.discovery_load_error}.\n$_errorMessage',
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: _loadUsers,
-                  child: const Text('Thử lại'),
+                  child: Text(l10n.common_retry),
                 ),
               ],
             ),
@@ -256,7 +261,7 @@ class _DiscoveryScreenState extends ConsumerState<DiscoveryScreen> {
     if (_users.isEmpty) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Discover'),
+          title: Text(l10n.discovery_title),
           actions: [
             _buildSortMenu(filters),
             IconButton(
@@ -277,14 +282,14 @@ class _DiscoveryScreenState extends ConsumerState<DiscoveryScreen> {
               children: [
                 const Icon(Icons.people_outline, size: 64, color: Colors.grey),
                 const SizedBox(height: 16),
-                const Text(
-                  'Hiện chưa có gợi ý nào.\nHãy thử lại sau hoặc cập nhật bộ lọc.',
+                Text(
+                  l10n.discovery_empty,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 12),
                 ElevatedButton(
                   onPressed: _loadUsers,
-                  child: const Text('Tải lại'),
+                  child: Text(l10n.discovery_reload),
                 ),
               ],
             ),
@@ -295,7 +300,7 @@ class _DiscoveryScreenState extends ConsumerState<DiscoveryScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Discover'),
+        title: Text(l10n.discovery_title),
         actions: [
           _buildSortMenu(filters),
           IconButton(
@@ -340,9 +345,9 @@ class _DiscoveryScreenState extends ConsumerState<DiscoveryScreen> {
             Positioned(
               top: showProfileReminder ? 100 : 16,
               right: 16,
-              child: const Chip(
-                avatar: Icon(Icons.bolt, color: Colors.green, size: 18),
-                label: Text('Chỉ hiển thị người đang online'),
+              child: Chip(
+                avatar: const Icon(Icons.bolt, color: Colors.green, size: 18),
+                label: Text(l10n.discovery_online_only),
               ),
             ),
           Positioned(
@@ -376,21 +381,22 @@ class _DiscoveryScreenState extends ConsumerState<DiscoveryScreen> {
   }
 
   Widget _buildSortMenu(DiscoveryFilters filters) {
-    final sortLabel = filters.sort == 'newest' ? 'Mới nhất' : 'Phù hợp nhất';
+    final l10n = context.l10n;
+    final sortLabel = filters.sort == 'newest' ? l10n.discovery_sort_newest : l10n.discovery_sort_best_match;
     return PopupMenuButton<String>(
-      tooltip: 'Sắp xếp',
+      tooltip: l10n.discovery_sort,
       initialValue: filters.sort,
       onSelected: (value) async {
         await ref.read(discoveryFiltersProvider.notifier).setSort(value);
       },
-      itemBuilder: (context) => const [
+      itemBuilder: (context) => [
         PopupMenuItem(
           value: 'best',
-          child: Text('Phù hợp nhất'),
+          child: Text(l10n.discovery_sort_best_match),
         ),
         PopupMenuItem(
           value: 'newest',
-          child: Text('Mới nhất'),
+          child: Text(l10n.discovery_sort_newest),
         ),
       ],
       child: Row(
@@ -412,6 +418,7 @@ class _DiscoveryScreenState extends ConsumerState<DiscoveryScreen> {
   }
 
   Widget _buildProfileReminderBanner() {
+    final l10n = context.l10n;
     return Card(
       color: Colors.orange.shade50,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -421,25 +428,25 @@ class _DiscoveryScreenState extends ConsumerState<DiscoveryScreen> {
           children: [
             const Icon(Icons.tips_and_updates, color: Colors.deepOrange),
             const SizedBox(width: 12),
-            const Expanded(
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'Hoàn thiện hồ sơ để có đề xuất tốt hơn',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    l10n.discovery_complete_profile_title,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
-                    'Thêm sở thích và lifestyle giúp hệ thống hiểu bạn hơn.',
+                    l10n.discovery_complete_profile_subtitle,
                   ),
                 ],
               ),
             ),
             TextButton(
               onPressed: () => context.push('/profile/edit'),
-              child: const Text('Cập nhật'),
+              child: Text(l10n.discovery_update_button),
             ),
           ],
         ),
@@ -539,8 +546,9 @@ class _DiscoveryFiltersSheetState extends State<DiscoveryFiltersSheet> {
     setState(() {
       if (selected) {
         if (_selectedInterests.length >= 5) {
+          final l10n = context.l10n;
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Chỉ chọn tối đa 5 sở thích')),
+            SnackBar(content: Text(l10n.discovery_filters_interests_limit)),
           );
           return;
         }
@@ -553,11 +561,12 @@ class _DiscoveryFiltersSheetState extends State<DiscoveryFiltersSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final genderOptions = {
-      'male': 'Nam',
-      'female': 'Nữ',
-      'non-binary': 'Phi nhị nguyên',
-      'other': 'Khác',
+      'male': l10n.profile_setup_gender_male,
+      'female': l10n.profile_setup_gender_female,
+      'non-binary': l10n.profile_setup_gender_non_binary,
+      'other': l10n.profile_setup_gender_other,
     };
 
     return FractionallySizedBox(
@@ -570,18 +579,18 @@ class _DiscoveryFiltersSheetState extends State<DiscoveryFiltersSheet> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Bộ lọc đề xuất',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                Text(
+                  l10n.discovery_filters_title,
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 TextButton(
                   onPressed: _reset,
-                  child: const Text('Đặt lại'),
+                  child: Text(l10n.discovery_filter_reset),
                 ),
               ],
             ),
             const SizedBox(height: 16),
-            const Text('Độ tuổi mong muốn'),
+            Text(l10n.discovery_filters_age_range),
             RangeSlider(
               values: _ageRange,
               min: 18,
@@ -594,7 +603,7 @@ class _DiscoveryFiltersSheetState extends State<DiscoveryFiltersSheet> {
               onChanged: (values) => setState(() => _ageRange = values),
             ),
             const SizedBox(height: 16),
-            const Text('Giới tính hiển thị'),
+            Text(l10n.discovery_filters_gender_show),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -616,7 +625,7 @@ class _DiscoveryFiltersSheetState extends State<DiscoveryFiltersSheet> {
               }).toList(),
             ),
             const SizedBox(height: 16),
-            const Text('Lifestyle phù hợp'),
+            Text(l10n.discovery_filters_lifestyle_match),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -638,7 +647,7 @@ class _DiscoveryFiltersSheetState extends State<DiscoveryFiltersSheet> {
               }).toList(),
             ),
             const SizedBox(height: 16),
-            const Text('Sở thích chung (tối đa 5)'),
+            Text(l10n.discovery_filters_interests_common),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -652,27 +661,27 @@ class _DiscoveryFiltersSheetState extends State<DiscoveryFiltersSheet> {
               }).toList(),
             ),
             const SizedBox(height: 16),
-            const Text('Khoảng cách tối đa (km)'),
+            Text(l10n.discovery_filters_distance_max),
             Slider(
               value: _distance,
               min: 5,
               max: 200,
               divisions: 39,
-              label: _noDistanceLimit ? 'Không giới hạn' : '${_distance.round()} km',
+              label: _noDistanceLimit ? l10n.discovery_filters_no_limit : '${_distance.round()} km',
               onChanged: _noDistanceLimit ? null : (value) => setState(() => _distance = value),
             ),
             const SizedBox(height: 8),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Không giới hạn khoảng cách'),
-              subtitle: const Text('Hiển thị tất cả người dùng bất kể vị trí'),
+              title: Text(l10n.discovery_filters_no_distance_limit),
+              subtitle: Text(l10n.discovery_filters_no_distance_subtitle),
               value: _noDistanceLimit,
               onChanged: (value) => setState(() => _noDistanceLimit = value),
             ),
             const SizedBox(height: 8),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Chỉ hiển thị người đang online'),
+              title: Text(l10n.discovery_online_only),
               value: _onlyOnline,
               onChanged: (value) => setState(() => _onlyOnline = value),
             ),
@@ -683,7 +692,7 @@ class _DiscoveryFiltersSheetState extends State<DiscoveryFiltersSheet> {
                 onPressed: () {
                   if (_showMe.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Chọn ít nhất một giới tính hiển thị')),
+                      SnackBar(content: Text(l10n.discovery_filters_gender_required)),
                     );
                     return;
                   }
@@ -700,7 +709,7 @@ class _DiscoveryFiltersSheetState extends State<DiscoveryFiltersSheet> {
                     ),
                   );
                 },
-                child: const Text('Áp dụng bộ lọc'),
+                child: Text(l10n.discovery_filters_apply),
               ),
             ),
             const SizedBox(height: 16),

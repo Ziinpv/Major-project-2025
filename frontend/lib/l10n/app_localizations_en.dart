@@ -242,6 +242,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profile_interests => 'Interests';
 
   @override
+  String get profile_lifestyle => 'Lifestyle';
+
+  @override
   String get profile_edit_button => 'Edit Profile';
 
   @override
@@ -461,4 +464,119 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboarding_login => 'Already have an account? Login';
+
+  @override
+  String swipe_liked(String name) {
+    return 'You liked $name';
+  }
+
+  @override
+  String swipe_superliked(String name) {
+    return 'You Super Liked $name';
+  }
+
+  @override
+  String swipe_passed(String name) {
+    return 'Passed $name';
+  }
+
+  @override
+  String get swipe_action_failed => 'Failed to send action';
+
+  @override
+  String get swipe_match_title => 'It\'s a match!';
+
+  @override
+  String swipe_match_message(String name) {
+    return 'You and $name liked each other. Start chatting!';
+  }
+
+  @override
+  String swipe_match_time(String time) {
+    return 'Matched at: $time';
+  }
+
+  @override
+  String get swipe_chat_now => 'Send Message';
+
+  @override
+  String get discovery_sort => 'Sort';
+
+  @override
+  String get discovery_sort_best_match => 'Best Match';
+
+  @override
+  String get discovery_sort_newest => 'Newest';
+
+  @override
+  String get discovery_load_error => 'Unable to load users';
+
+  @override
+  String get discovery_empty =>
+      'No suggestions available.\nTry again later or update your filters.';
+
+  @override
+  String get discovery_reload => 'Reload';
+
+  @override
+  String get discovery_online_only => 'Only show online users';
+
+  @override
+  String get discovery_filters_title => 'Discovery Filters';
+
+  @override
+  String get discovery_filters_age_range => 'Age Range';
+
+  @override
+  String get discovery_filters_gender_show => 'Show Me';
+
+  @override
+  String get discovery_filters_lifestyle_match => 'Matching Lifestyle';
+
+  @override
+  String get discovery_filters_interests_common => 'Common Interests (max 5)';
+
+  @override
+  String get discovery_filters_distance_max => 'Maximum Distance (km)';
+
+  @override
+  String get discovery_filters_no_distance_limit => 'No distance limit';
+
+  @override
+  String get discovery_filters_no_distance_subtitle =>
+      'Show all users regardless of location';
+
+  @override
+  String get discovery_filters_apply => 'Apply Filters';
+
+  @override
+  String get discovery_filters_gender_required => 'Select at least one gender';
+
+  @override
+  String get discovery_filters_interests_limit =>
+      'Select up to 5 interests only';
+
+  @override
+  String get discovery_filters_no_limit => 'No limit';
+
+  @override
+  String get matches_empty => 'No matches yet';
+
+  @override
+  String get matches_load_error => 'Unable to load matches';
+
+  @override
+  String get matches_chat_error => 'Unable to open chat';
+
+  @override
+  String get matches_unknown_user => 'Unknown';
+
+  @override
+  String get chat_list_empty => 'No conversations yet';
+
+  @override
+  String get chat_list_load_error => 'Unable to load chats';
+
+  @override
+  String get chat_room_other_user_unknown => 'Unknown user';
 }

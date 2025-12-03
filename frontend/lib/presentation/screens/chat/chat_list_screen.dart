@@ -3,9 +3,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import '../../../core/extensions/localization_extension.dart';
 import '../../../data/models/chat_room_model.dart';
 import '../../../data/providers/auth_provider.dart';
 import '../../../data/providers/chat_provider.dart';
+import '../../../data/providers/online_status_provider.dart';
 import '../../../core/services/socket_service.dart';
 
 class ChatListScreen extends ConsumerStatefulWidget {
@@ -31,6 +33,9 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
     await _socketService.connect();
     _socketService.on('new-message', _handleRealtimeUpdate);
     _socketService.on('match:created', (_) => _loadChatRooms(silent: true));
+    _socketService.on('user-online', _handleUserOnline);
+    _socketService.on('user-offline', _handleUserOffline);
+    _socketService.on('online-users-list', _handleOnlineUsersList);
     await _loadChatRooms();
   }
 
@@ -38,6 +43,9 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
   void dispose() {
     _socketService.off('new-message');
     _socketService.off('match:created');
+    _socketService.off('user-online');
+    _socketService.off('user-offline');
+    _socketService.off('online-users-list');
     super.dispose();
   }
 
@@ -73,13 +81,51 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
     }
   }
 
+  void _handleUserOnline(dynamic data) {
+    if (!mounted) return;
+    if (data is! Map<String, dynamic>) return;
+    
+    final userId = data['userId'] as String?;
+    if (userId == null) return;
+    
+    ref.read(onlineStatusProvider.notifier).setUserOnline(userId);
+  }
+
+  void _handleUserOffline(dynamic data) {
+    if (!mounted) return;
+    if (data is! Map<String, dynamic>) return;
+    
+    final userId = data['userId'] as String?;
+    if (userId == null) return;
+    
+    ref.read(onlineStatusProvider.notifier).setUserOffline(userId);
+  }
+
+  void _handleOnlineUsersList(dynamic data) {
+    if (!mounted) return;
+    if (data is! Map<String, dynamic>) return;
+    
+    final userIds = data['userIds'] as List?;
+    if (userIds == null) return;
+    
+    // Mark all users in the list as online
+    for (var userId in userIds) {
+      if (userId is String) {
+        ref.read(onlineStatusProvider.notifier).setUserOnline(userId);
+      }
+    }
+    
+    print('📋 Received online users list: ${userIds.length} users online');
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final currentUserId = ref.watch(authProvider).user?.id;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Messages'),
+        title: Text(l10n.chat_title),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -92,6 +138,8 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
   }
 
   Widget _buildBody(String? currentUserId) {
+    final l10n = context.l10n;
+    
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -102,18 +150,18 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
           children: [
             const Icon(Icons.error_outline, color: Colors.red, size: 48),
             const SizedBox(height: 8),
-            Text(_error!, textAlign: TextAlign.center),
+            Text('${l10n.chat_list_load_error}.\n$_error', textAlign: TextAlign.center),
             const SizedBox(height: 8),
             ElevatedButton(
               onPressed: _loadChatRooms,
-              child: const Text('Thử lại'),
+              child: Text(l10n.common_retry),
             ),
           ],
         ),
       );
     }
     if (_chatRooms.isEmpty) {
-      return const Center(child: Text('Chưa có cuộc trò chuyện nào'));
+      return Center(child: Text(l10n.chat_list_empty));
     }
     return RefreshIndicator(
       onRefresh: () => _loadChatRooms(),
@@ -128,6 +176,7 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
   }
 
   Widget _buildChatRoomTile(ChatRoomModel chatRoom, String? currentUserId) {
+    final l10n = context.l10n;
     final otherUser = currentUserId != null
         ? chatRoom.getOtherUser(currentUserId)
         : chatRoom.participants.isNotEmpty
@@ -135,27 +184,48 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
             : null;
     final unreadCount = currentUserId != null ? chatRoom.getUnreadCount(currentUserId) : 0;
     final lastMessageTime = chatRoom.lastMessageAt != null
-        ? DateFormat('dd/MM HH:mm').format(chatRoom.lastMessageAt!)
+        ? DateFormat('dd/MM HH:mm').format(chatRoom.lastMessageAt!.toLocal())
         : '';
+    final isOnline = otherUser?.id != null 
+        ? ref.watch(onlineStatusProvider)[otherUser!.id] ?? false
+        : false;
 
     return ListTile(
-      leading: CircleAvatar(
-        radius: 26,
-        backgroundImage: otherUser?.primaryPhoto != null
-            ? CachedNetworkImageProvider(otherUser!.primaryPhoto!)
-            : null,
-        child: otherUser?.primaryPhoto == null
-            ? Text(otherUser?.firstName.substring(0, 1) ?? '?')
-            : null,
+      leading: Stack(
+        children: [
+          CircleAvatar(
+            radius: 26,
+            backgroundImage: otherUser?.primaryPhoto != null
+                ? CachedNetworkImageProvider(otherUser!.primaryPhoto!)
+                : null,
+            child: otherUser?.primaryPhoto == null
+                ? Text(otherUser?.firstName.substring(0, 1) ?? '?')
+                : null,
+          ),
+          if (isOnline)
+            Positioned(
+              right: 0,
+              bottom: 0,
+              child: Container(
+                width: 14,
+                height: 14,
+                decoration: BoxDecoration(
+                  color: Colors.greenAccent,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 2),
+                ),
+              ),
+            ),
+        ],
       ),
       title: Text(
-        otherUser?.fullName ?? 'Ẩn danh',
+        otherUser?.fullName ?? l10n.chat_room_other_user_unknown,
         style: TextStyle(
           fontWeight: unreadCount > 0 ? FontWeight.bold : FontWeight.normal,
         ),
       ),
       subtitle: Text(
-        chatRoom.lastMessage?.content ?? 'Chưa có tin nhắn',
+        chatRoom.lastMessage?.content ?? l10n.chat_no_messages,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
@@ -187,4 +257,3 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
     );
   }
 }
-

@@ -91,6 +91,7 @@
   "profile_job": "Job",
   "profile_school": "School",
   "profile_interests": "Interests",
+  "profile_lifestyle": "Lifestyle",
   "profile_edit_button": "Edit Profile",
   
   "profile_edit_title": "Edit Profile",
@@ -176,6 +177,69 @@
   "onboarding_welcome": "Welcome to Matcha",
   "onboarding_subtitle": "Find meaningful connections",
   "onboarding_get_started": "Get Started",
-  "onboarding_login": "Already have an account? Login"
+  "onboarding_login": "Already have an account? Login",
+
+  "swipe_liked": "You liked {name}",
+  "@swipe_liked": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "swipe_superliked": "You Super Liked {name}",
+  "@swipe_superliked": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "swipe_passed": "Passed {name}",
+  "@swipe_passed": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "swipe_action_failed": "Failed to send action",
+  "swipe_match_title": "It's a match!",
+  "swipe_match_message": "You and {name} liked each other. Start chatting!",
+  "@swipe_match_message": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "swipe_match_time": "Matched at: {time}",
+  "@swipe_match_time": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "swipe_chat_now": "Send Message",
+  
+  "discovery_sort": "Sort",
+  "discovery_sort_best_match": "Best Match",
+  "discovery_sort_newest": "Newest",
+  "discovery_load_error": "Unable to load users",
+  "discovery_empty": "No suggestions available.\nTry again later or update your filters.",
+  "discovery_reload": "Reload",
+  "discovery_online_only": "Only show online users",
+  "discovery_filters_title": "Discovery Filters",
+  "discovery_filters_age_range": "Age Range",
+  "discovery_filters_gender_show": "Show Me",
+  "discovery_filters_lifestyle_match": "Matching Lifestyle",
+  "discovery_filters_interests_common": "Common Interests (max 5)",
+  "discovery_filters_distance_max": "Maximum Distance (km)",
+  "discovery_filters_no_distance_limit": "No distance limit",
+  "discovery_filters_no_distance_subtitle": "Show all users regardless of location",
+  "discovery_filters_apply": "Apply Filters",
+  "discovery_filters_gender_required": "Select at least one gender",
+  "discovery_filters_interests_limit": "Select up to 5 interests only",
+  "discovery_filters_no_limit": "No limit",
+  
+  "matches_empty": "No matches yet",
+  "matches_load_error": "Unable to load matches",
+  "matches_chat_error": "Unable to open chat",
+  "matches_unknown_user": "Unknown",
+  
+  "chat_list_empty": "No conversations yet",
+  "chat_list_load_error": "Unable to load chats",
+  "chat_room_other_user_unknown": "Unknown user"
 }
 

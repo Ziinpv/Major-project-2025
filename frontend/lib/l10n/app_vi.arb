@@ -91,6 +91,7 @@
   "profile_job": "Công việc",
   "profile_school": "Trường học",
   "profile_interests": "Sở thích",
+  "profile_lifestyle": "Phong cách sống",
   "profile_edit_button": "Chỉnh sửa hồ sơ",
   
   "profile_edit_title": "Chỉnh sửa hồ sơ",
@@ -176,6 +177,69 @@
   "onboarding_welcome": "Chào mừng đến với Matcha",
   "onboarding_subtitle": "Tìm kiếm những kết nối ý nghĩa",
   "onboarding_get_started": "Bắt đầu",
-  "onboarding_login": "Đã có tài khoản? Đăng nhập"
+  "onboarding_login": "Đã có tài khoản? Đăng nhập",
+
+  "swipe_liked": "Bạn đã thích {name}",
+  "@swipe_liked": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "swipe_superliked": "Bạn đã Super Like {name}",
+  "@swipe_superliked": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "swipe_passed": "Đã bỏ qua {name}",
+  "@swipe_passed": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "swipe_action_failed": "Không thể gửi thao tác",
+  "swipe_match_title": "It's a match!",
+  "swipe_match_message": "Bạn và {name} đã thích nhau. Hãy bắt đầu trò chuyện!",
+  "@swipe_match_message": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "swipe_match_time": "Thời gian match: {time}",
+  "@swipe_match_time": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "swipe_chat_now": "Nhắn tin ngay",
+  
+  "discovery_sort": "Sắp xếp",
+  "discovery_sort_best_match": "Phù hợp nhất",
+  "discovery_sort_newest": "Mới nhất",
+  "discovery_load_error": "Không thể tải danh sách người dùng",
+  "discovery_empty": "Hiện chưa có gợi ý nào.\nHãy thử lại sau hoặc cập nhật bộ lọc.",
+  "discovery_reload": "Tải lại",
+  "discovery_online_only": "Chỉ hiển thị người đang online",
+  "discovery_filters_title": "Bộ lọc đề xuất",
+  "discovery_filters_age_range": "Độ tuổi mong muốn",
+  "discovery_filters_gender_show": "Giới tính hiển thị",
+  "discovery_filters_lifestyle_match": "Lifestyle phù hợp",
+  "discovery_filters_interests_common": "Sở thích chung (tối đa 5)",
+  "discovery_filters_distance_max": "Khoảng cách tối đa (km)",
+  "discovery_filters_no_distance_limit": "Không giới hạn khoảng cách",
+  "discovery_filters_no_distance_subtitle": "Hiển thị tất cả người dùng bất kể vị trí",
+  "discovery_filters_apply": "Áp dụng bộ lọc",
+  "discovery_filters_gender_required": "Chọn ít nhất một giới tính hiển thị",
+  "discovery_filters_interests_limit": "Chỉ chọn tối đa 5 sở thích",
+  "discovery_filters_no_limit": "Không giới hạn",
+  
+  "matches_empty": "Chưa có match nào",
+  "matches_load_error": "Không thể tải danh sách match",
+  "matches_chat_error": "Không thể mở chat",
+  "matches_unknown_user": "Không xác định",
+  
+  "chat_list_empty": "Chưa có cuộc trò chuyện nào",
+  "chat_list_load_error": "Không thể tải danh sách chat",
+  "chat_room_other_user_unknown": "Người dùng không xác định"
 }
 

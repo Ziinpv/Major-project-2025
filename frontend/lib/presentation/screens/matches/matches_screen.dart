@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/extensions/localization_extension.dart';
 import '../../../data/models/match_model.dart';
 import '../../../data/providers/match_provider.dart';
 import '../../../data/providers/auth_provider.dart';
@@ -18,6 +19,7 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
   String? _openingMatchId;
 
   Future<void> _navigateToChat(MatchModel match) async {
+    final l10n = context.l10n;
     final chatRepo = ref.read(chatRepositoryProvider);
     setState(() {
       _openingMatchId = match.id;
@@ -29,7 +31,7 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Không thể mở chat: $e')),
+        SnackBar(content: Text('${l10n.matches_chat_error}: $e')),
       );
     } finally {
       if (mounted) {
@@ -42,12 +44,13 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final matchesAsync = ref.watch(matchesProvider);
     final currentUserId = ref.watch(authProvider).user?.id;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Matches'),
+        title: Text(l10n.matches_title),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -58,7 +61,7 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
       body: matchesAsync.when(
         data: (matches) {
           if (matches.isEmpty) {
-            return const Center(child: Text('Chưa có match nào.'));
+            return Center(child: Text(l10n.matches_empty));
           }
           return RefreshIndicator(
             onRefresh: () async {
@@ -124,7 +127,7 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
-                            otherUser?.fullName ?? 'Không xác định',
+                            otherUser?.fullName ?? l10n.matches_unknown_user,
                             style: const TextStyle(fontWeight: FontWeight.bold),
                             textAlign: TextAlign.center,
                           ),
@@ -144,11 +147,11 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
             children: [
               const Icon(Icons.error_outline, size: 48, color: Colors.red),
               const SizedBox(height: 8),
-              Text('Không thể tải danh sách match.\n$error', textAlign: TextAlign.center),
+              Text('${l10n.matches_load_error}.\n$error', textAlign: TextAlign.center),
               const SizedBox(height: 8),
               ElevatedButton(
                 onPressed: () => ref.refresh(matchesProvider),
-                child: const Text('Thử lại'),
+                child: Text(l10n.common_retry),
               ),
             ],
           ),
@@ -157,4 +160,3 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
     );
   }
 }
-

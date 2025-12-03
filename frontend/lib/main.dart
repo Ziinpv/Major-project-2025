@@ -8,6 +8,7 @@ import 'core/providers/app_theme_provider.dart';
 import 'core/providers/language_provider.dart';
 import 'core/providers/text_scale_provider.dart';
 import 'core/services/notification_service.dart';
+import 'data/providers/socket_connection_provider.dart';
 import 'l10n/app_localizations.dart';
 
 // Background message handler
@@ -40,6 +41,9 @@ class MatchaApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Initialize socket connection based on auth state
+    ref.watch(socketConnectionProvider);
+    
     final router = ref.watch(routerProvider);
     final themeMode = ref.watch(appThemeProvider);
     final textScale = ref.watch(textScaleProvider);
