@@ -422,6 +422,45 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_account => 'Account';
 
   @override
+  String get settings_change_password => 'Change Password';
+
+  @override
+  String get settings_change_password_subtitle => 'Update your password';
+
+  @override
+  String get settings_current_password => 'Current Password';
+
+  @override
+  String get settings_new_password => 'New Password';
+
+  @override
+  String get settings_confirm_new_password => 'Confirm New Password';
+
+  @override
+  String get settings_password_changed_success =>
+      'Password changed successfully';
+
+  @override
+  String get settings_delete_account => 'Delete Account';
+
+  @override
+  String get settings_delete_account_warning => 'WARNING';
+
+  @override
+  String get settings_delete_account_message =>
+      'ARE YOU SURE YOU WANT TO CONTINUE? DELETING YOUR ACCOUNT CANNOT BE UNDONE.';
+
+  @override
+  String get settings_delete_account_password_hint =>
+      'Enter password to confirm';
+
+  @override
+  String get settings_delete_permanently => 'Delete Permanently';
+
+  @override
+  String get settings_account_deleted_success => 'Account deleted successfully';
+
+  @override
   String get settings_logout => 'Logout';
 
   @override

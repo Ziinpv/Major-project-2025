@@ -13,10 +13,7 @@ class ChatBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final otherBubbleColor = isDarkMode ? Colors.grey[800] : Colors.grey[300];
-    final otherTextColor = isDarkMode ? Colors.white : Colors.black;
-    final otherTimeColor = isDarkMode ? Colors.grey[400] : Colors.black54;
+    final colorScheme = Theme.of(context).colorScheme;
     
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
@@ -27,8 +24,11 @@ class ChatBubble extends StatelessWidget {
           maxWidth: MediaQuery.of(context).size.width * 0.7,
         ),
         decoration: BoxDecoration(
-          color: isMe ? const Color(0xFFE91E63) : otherBubbleColor,
+          color: isMe ? colorScheme.primary : colorScheme.surface,
           borderRadius: BorderRadius.circular(20),
+          border: isMe ? null : Border.all(
+            color: colorScheme.secondary.withOpacity(0.3),
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,7 +36,7 @@ class ChatBubble extends StatelessWidget {
             Text(
               message.content,
               style: TextStyle(
-                color: isMe ? Colors.white : otherTextColor,
+                color: isMe ? colorScheme.onPrimary : colorScheme.onSurface,
                 fontSize: 16,
               ),
             ),
@@ -47,7 +47,9 @@ class ChatBubble extends StatelessWidget {
                 Text(
                   '${message.createdAt.hour}:${message.createdAt.minute.toString().padLeft(2, '0')}',
                   style: TextStyle(
-                    color: isMe ? Colors.white70 : otherTimeColor,
+                    color: isMe 
+                        ? colorScheme.onPrimary.withOpacity(0.7) 
+                        : colorScheme.onSurface.withOpacity(0.6),
                     fontSize: 12,
                   ),
                 ),
@@ -56,7 +58,9 @@ class ChatBubble extends StatelessWidget {
                   Icon(
                     message.isRead ? Icons.done_all : Icons.done,
                     size: 16,
-                    color: message.isRead ? Colors.blue[300] : Colors.white70,
+                    color: message.isRead 
+                        ? Colors.blue[300] 
+                        : colorScheme.onPrimary.withOpacity(0.7),
                   ),
                 ],
               ],

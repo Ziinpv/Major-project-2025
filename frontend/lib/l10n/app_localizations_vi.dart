@@ -421,6 +421,45 @@ class AppLocalizationsVi extends AppLocalizations {
   String get settings_account => 'Tài khoản';
 
   @override
+  String get settings_change_password => 'Đổi mật khẩu';
+
+  @override
+  String get settings_change_password_subtitle => 'Cập nhật mật khẩu của bạn';
+
+  @override
+  String get settings_current_password => 'Mật khẩu hiện tại';
+
+  @override
+  String get settings_new_password => 'Mật khẩu mới';
+
+  @override
+  String get settings_confirm_new_password => 'Xác nhận mật khẩu mới';
+
+  @override
+  String get settings_password_changed_success => 'Đổi mật khẩu thành công';
+
+  @override
+  String get settings_delete_account => 'Xóa tài khoản';
+
+  @override
+  String get settings_delete_account_warning => 'CẢNH BÁO';
+
+  @override
+  String get settings_delete_account_message =>
+      'BẠN CÓ CHẮC MUỐN TIẾP TỤC? VIỆC XÓA TÀI KHOẢN SẼ KHÔNG THỂ KHÔI PHỤC.';
+
+  @override
+  String get settings_delete_account_password_hint =>
+      'Nhập mật khẩu để xác nhận';
+
+  @override
+  String get settings_delete_permanently => 'Xóa vĩnh viễn';
+
+  @override
+  String get settings_account_deleted_success =>
+      'Tài khoản đã được xóa thành công';
+
+  @override
   String get settings_logout => 'Đăng xuất';
 
   @override

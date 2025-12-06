@@ -902,6 +902,78 @@ abstract class AppLocalizations {
   /// **'Tài khoản'**
   String get settings_account;
 
+  /// No description provided for @settings_change_password.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đổi mật khẩu'**
+  String get settings_change_password;
+
+  /// No description provided for @settings_change_password_subtitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Cập nhật mật khẩu của bạn'**
+  String get settings_change_password_subtitle;
+
+  /// No description provided for @settings_current_password.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mật khẩu hiện tại'**
+  String get settings_current_password;
+
+  /// No description provided for @settings_new_password.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mật khẩu mới'**
+  String get settings_new_password;
+
+  /// No description provided for @settings_confirm_new_password.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xác nhận mật khẩu mới'**
+  String get settings_confirm_new_password;
+
+  /// No description provided for @settings_password_changed_success.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đổi mật khẩu thành công'**
+  String get settings_password_changed_success;
+
+  /// No description provided for @settings_delete_account.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xóa tài khoản'**
+  String get settings_delete_account;
+
+  /// No description provided for @settings_delete_account_warning.
+  ///
+  /// In vi, this message translates to:
+  /// **'CẢNH BÁO'**
+  String get settings_delete_account_warning;
+
+  /// No description provided for @settings_delete_account_message.
+  ///
+  /// In vi, this message translates to:
+  /// **'BẠN CÓ CHẮC MUỐN TIẾP TỤC? VIỆC XÓA TÀI KHOẢN SẼ KHÔNG THỂ KHÔI PHỤC.'**
+  String get settings_delete_account_message;
+
+  /// No description provided for @settings_delete_account_password_hint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhập mật khẩu để xác nhận'**
+  String get settings_delete_account_password_hint;
+
+  /// No description provided for @settings_delete_permanently.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xóa vĩnh viễn'**
+  String get settings_delete_permanently;
+
+  /// No description provided for @settings_account_deleted_success.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tài khoản đã được xóa thành công'**
+  String get settings_account_deleted_success;
+
   /// No description provided for @settings_logout.
   ///
   /// In vi, this message translates to:

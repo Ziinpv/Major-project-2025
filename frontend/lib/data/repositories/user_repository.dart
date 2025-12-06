@@ -73,5 +73,118 @@ class UserRepository {
       throw Exception('Failed to update location');
     }
   }
+
+  Future<void> changePassword({
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    try {
+      final payload = {
+        'oldPassword': oldPassword,
+        'newPassword': newPassword,
+      };
+
+      print('🔐 Calling API: PUT /users/password');
+      final response = await _api.put('/users/password', data: payload);
+      
+      print('✅ Response status: ${response.statusCode}');
+      if (response.statusCode == 200) {
+        return;
+      }
+    } on Exception catch (e) {
+      print('❌ Exception caught: $e');
+      // Try to extract error from DioException
+      final errorString = e.toString();
+      
+      // Extract error message from DioException if available
+      if (errorString.contains('DioException')) {
+        try {
+          // Get the actual exception object
+          final dynamic dioError = e;
+          final response = (dioError as dynamic).response;
+          
+          if (response != null) {
+            print('Response status code: ${response.statusCode}');
+            print('Response data: ${response.data}');
+            
+            final data = response.data;
+            if (data is Map && data.containsKey('error')) {
+              final errorMsg = data['error'] as String;
+              print('Error message from backend: $errorMsg');
+              throw Exception(errorMsg);
+            }
+            
+            // Fallback based on status code
+            if (response.statusCode == 400) {
+              throw Exception('You signed in with Google/Firebase. Please use password reset to set a password first.');
+            } else if (response.statusCode == 401) {
+              throw Exception('Current password is incorrect');
+            }
+          }
+        } catch (extractError) {
+          print('Error extracting message: $extractError');
+          // If extraction fails, check if error already contains useful message
+          if (errorString.contains('Cannot change password')) {
+            rethrow;
+          }
+        }
+      }
+      
+      // If we get here, rethrow or provide generic message
+      throw Exception('Failed to change password. Please try again or contact support.');
+    }
+  }
+
+  Future<void> deleteAccount({required String password}) async {
+    try {
+      final payload = {
+        'password': password,
+      };
+
+      print('🗑️ Calling API: DELETE /users/account');
+      final response = await _api.delete('/users/account', data: payload);
+      
+      print('✅ Response status: ${response.statusCode}');
+      if (response.statusCode == 200) {
+        return;
+      }
+    } on Exception catch (e) {
+      print('❌ Exception caught: $e');
+      final errorString = e.toString();
+      
+      if (errorString.contains('DioException')) {
+        try {
+          final dynamic dioError = e;
+          final response = (dioError as dynamic).response;
+          
+          if (response != null) {
+            print('Response status code: ${response.statusCode}');
+            print('Response data: ${response.data}');
+            
+            final data = response.data;
+            if (data is Map && data.containsKey('error')) {
+              final errorMsg = data['error'] as String;
+              print('Error message from backend: $errorMsg');
+              throw Exception(errorMsg);
+            }
+            
+            if (response.statusCode == 401) {
+              throw Exception('Incorrect password');
+            } else if (response.statusCode == 400) {
+              throw Exception('Account is already deleted or invalid request');
+            }
+          }
+        } catch (extractError) {
+          print('Error extracting message: $extractError');
+          if (extractError is Exception) {
+            rethrow;
+          }
+        }
+      }
+      
+      throw Exception('Failed to delete account. Please try again.');
+    }
+  }
 }
+
 

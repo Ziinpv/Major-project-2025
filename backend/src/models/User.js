@@ -158,6 +158,10 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
+  deletedAt: {
+    type: Date,
+    default: null
+  },
   preferences: {
     ageRange: {
       min: { type: Number, default: DEFAULT_PREFERENCES.MIN_AGE },

@@ -41,11 +41,16 @@ initializeFirebase();
 // Middleware
 app.use(helmet());
 app.use(compression());
-app.use(requestLogger);
+
+// CORS must be before other middleware
 app.use(cors({
   origin: process.env.CORS_ORIGIN || '*',
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
+
+app.use(requestLogger);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
@@ -89,8 +94,16 @@ mongoose.connect(process.env.MONGODB_URI, {
   .then(() => {
     console.log('✅ MongoDB connected');
     const PORT = process.env.PORT || 3000;
-    server.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
+    const HOST = process.env.HOST || '0.0.0.0'; // Listen on all network interfaces
+    
+    server.listen(PORT, HOST, () => {
+      console.log(`🚀 Server running on http://${HOST}:${PORT}`);
+      console.log(`📱 Access from mobile device:`);
+      console.log(`   - http://192.168.1.43:${PORT} (Local WiFi/Ethernet)`);
+      console.log(`   - http://26.197.138.220:${PORT} (VPN/Virtual network)`);
+      console.log(`💻 Access from localhost: http://localhost:${PORT}`);
+      console.log(`\n✅ Backend is ready to receive requests!`);
+      console.log(`📊 Request logging is ENABLED - All incoming requests will be logged`);
     });
   })
   .catch((error) => {

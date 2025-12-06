@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../core/extensions/localization_extension.dart';
 import '../../../core/providers/app_theme_provider.dart';
@@ -10,6 +11,9 @@ import '../../../core/providers/language_provider.dart';
 import '../../../core/providers/text_scale_provider.dart';
 import '../../../core/services/api_service.dart';
 import '../../../data/providers/auth_provider.dart';
+import '../../../data/providers/user_provider.dart';
+import 'change_password_dialog.dart';
+import 'change_firebase_password_dialog.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -206,6 +210,39 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             title: l10n.settings_account,
             children: [
               ListTile(
+                leading: const Icon(Icons.lock_outline),
+                title: Text(l10n.settings_change_password),
+                subtitle: Text(l10n.settings_change_password_subtitle),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () {
+                  // Check if user is authenticated with Firebase
+                  final firebaseUser = FirebaseAuth.instance.currentUser;
+                  
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      // Use Firebase password dialog for Firebase-authenticated users
+                      if (firebaseUser != null) {
+                        return const ChangeFirebasePasswordDialog();
+                      }
+                      // Use MongoDB password dialog for email/password users
+                      return const ChangePasswordDialog();
+                    },
+                  );
+                },
+              ),
+              const Divider(),
+              ListTile(
+                leading: const Icon(Icons.delete_forever, color: Colors.red),
+                title: Text(
+                  l10n.settings_delete_account,
+                  style: const TextStyle(color: Colors.red),
+                ),
+                trailing: const Icon(Icons.chevron_right, color: Colors.red),
+                onTap: _confirmDeleteAccount,
+              ),
+              const Divider(),
+              ListTile(
                 leading: const Icon(Icons.logout, color: Colors.red),
                 title: Text(l10n.settings_logout),
                 onTap: _confirmLogout,
@@ -260,6 +297,190 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     if (confirm == true) {
       await ref.read(authProvider.notifier).logout();
       if (mounted) {
+        context.go('/auth/login');
+      }
+    }
+  }
+
+  Future<void> _confirmDeleteAccount() async {
+    final l10n = context.l10n;
+    final passwordController = TextEditingController();
+    final firebaseUser = FirebaseAuth.instance.currentUser;
+    bool isLoading = false;
+
+    final result = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            title: Row(
+              children: [
+                const Icon(Icons.warning, color: Colors.red, size: 28),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    l10n.settings_delete_account_warning,
+                    style: const TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.settings_delete_account_message,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                TextField(
+                  controller: passwordController,
+                  obscureText: true,
+                  enabled: !isLoading,
+                  decoration: InputDecoration(
+                    labelText: l10n.settings_delete_account_password_hint,
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.lock),
+                  ),
+                  onChanged: (value) {
+                    // Trigger rebuild to enable/disable button
+                    setState(() {});
+                  },
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: isLoading ? null : () => Navigator.of(context).pop(false),
+                child: Text(l10n.common_cancel),
+              ),
+              ElevatedButton(
+                onPressed: (isLoading || passwordController.text.isEmpty)
+                    ? null
+                    : () async {
+                        setState(() {
+                          isLoading = true;
+                        });
+
+                        try {
+                          // Step 1: Verify password with appropriate method
+                          if (firebaseUser != null && firebaseUser.email != null) {
+                            print('🔐 Verifying Firebase password...');
+                            // For Firebase users: Re-authenticate with Firebase first
+                            final credential = EmailAuthProvider.credential(
+                              email: firebaseUser.email!,
+                              password: passwordController.text,
+                            );
+                            
+                            await firebaseUser.reauthenticateWithCredential(credential);
+                            print('✅ Firebase password verified');
+                          }
+                          
+                          // Step 2: Call backend to delete account data
+                          print('🗑️ Calling backend to delete account data...');
+                          final userRepository = ref.read(userRepositoryProvider);
+                          await userRepository.deleteAccount(
+                            password: passwordController.text,
+                          );
+                          print('✅ Account data deleted from backend');
+                          
+                          // Step 3: Delete Firebase account
+                          if (firebaseUser != null) {
+                            print('🔥 Deleting Firebase account...');
+                            await firebaseUser.delete();
+                            print('✅ Firebase account deleted');
+                          }
+                          
+                          if (context.mounted) {
+                            Navigator.of(context).pop(true);
+                          }
+                        } on FirebaseAuthException catch (e) {
+                          print('❌ Firebase auth error: ${e.code}');
+                          if (context.mounted) {
+                            setState(() {
+                              isLoading = false;
+                            });
+                            
+                            String errorMessage = 'Incorrect password';
+                            if (e.code == 'wrong-password') {
+                              errorMessage = 'Current password is incorrect';
+                            } else if (e.code == 'too-many-requests') {
+                              errorMessage = 'Too many failed attempts. Please try again later';
+                            }
+                            
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(errorMessage),
+                                backgroundColor: Colors.red,
+                                duration: const Duration(seconds: 5),
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          print('❌ Error: $e');
+                          if (context.mounted) {
+                            setState(() {
+                              isLoading = false;
+                            });
+                            
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  e.toString().replaceAll('Exception: ', ''),
+                                ),
+                                backgroundColor: Colors.red,
+                                duration: const Duration(seconds: 5),
+                              ),
+                            );
+                          }
+                        }
+                      },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                ),
+                child: isLoading
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(l10n.settings_delete_permanently),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+
+    passwordController.dispose();
+
+    if (result == true) {
+      // Account deleted successfully
+      await ref.read(authProvider.notifier).logout();
+      
+      if (mounted) {
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.settings_account_deleted_success),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+
+        // Redirect to login
         context.go('/auth/login');
       }
     }

@@ -342,10 +342,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 
   Widget _buildMessageBubble(MessageModel message, bool isMe) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final otherBubbleColor = isDarkMode ? Colors.grey[800] : Colors.grey[200];
-    final otherTextColor = isDarkMode ? Colors.white : Colors.black;
-    final otherTimeColor = isDarkMode ? Colors.grey[400] : Colors.black54;
+    final colorScheme = Theme.of(context).colorScheme;
     
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
@@ -353,8 +350,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         margin: const EdgeInsets.symmetric(vertical: 4),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: isMe ? const Color(0xFFE91E63) : otherBubbleColor,
+          color: isMe ? colorScheme.primary : colorScheme.surface,
           borderRadius: BorderRadius.circular(20),
+          border: isMe ? null : Border.all(color: colorScheme.secondary.withOpacity(0.3)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -362,14 +360,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             Text(
               message.content,
               style: TextStyle(
-                color: isMe ? Colors.white : otherTextColor,
+                color: isMe ? colorScheme.onPrimary : colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 4),
             Text(
               '${message.createdAt.toLocal().hour.toString().padLeft(2, '0')}:${message.createdAt.toLocal().minute.toString().padLeft(2, '0')}',
               style: TextStyle(
-                color: isMe ? Colors.white70 : otherTimeColor,
+                color: isMe ? colorScheme.onPrimary.withOpacity(0.7) : colorScheme.onSurface.withOpacity(0.6),
                 fontSize: 12,
               ),
             ),
@@ -408,20 +406,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 
   Widget _buildMessageInput() {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor = isDarkMode ? Colors.grey[900] : Colors.white;
-    final textFieldFillColor = isDarkMode ? Colors.grey[850] : Colors.grey[100];
+    final colorScheme = Theme.of(context).colorScheme;
     
     return SafeArea(
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: backgroundColor,
+          color: colorScheme.surface,
           boxShadow: [
             BoxShadow(
-              color: isDarkMode 
-                  ? Colors.black.withOpacity(0.3)
-                  : Colors.black.withOpacity(0.05),
+              color: Colors.black.withOpacity(0.05),
               blurRadius: 4,
               offset: const Offset(0, -2),
             ),
@@ -432,32 +426,24 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             Expanded(
               child: TextField(
                 controller: _messageController,
-                style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
-                ),
+                style: TextStyle(color: colorScheme.onSurface),
                 decoration: InputDecoration(
                   hintText: 'Nhập tin nhắn...',
-                  hintStyle: TextStyle(
-                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
-                  ),
+                  hintStyle: TextStyle(color: colorScheme.onSurface.withOpacity(0.6)),
                   filled: true,
-                  fillColor: textFieldFillColor,
+                  fillColor: colorScheme.background,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(24),
-                    borderSide: BorderSide(
-                      color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
-                    ),
+                    borderSide: BorderSide(color: colorScheme.secondary),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(24),
-                    borderSide: BorderSide(
-                      color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
-                    ),
+                    borderSide: BorderSide(color: colorScheme.secondary),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(24),
-                    borderSide: const BorderSide(
-                      color: Color(0xFFE91E63),
+                    borderSide: BorderSide(
+                      color: colorScheme.primary,
                       width: 2,
                     ),
                   ),
@@ -472,13 +458,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             IconButton(
               onPressed: _isSending ? null : _sendMessage,
               icon: _isSending
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 20,
                       height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: colorScheme.primary,
+                      ),
                     )
-                  : const Icon(Icons.send),
-              color: const Color(0xFFE91E63),
+                  : Icon(Icons.send, color: colorScheme.primary),
             ),
           ],
         ),
