@@ -196,16 +196,7 @@ npm install
 
 Tạo file `.env` trong thư mục `backend/`:
 
-```env
-NODE_ENV=development
-PORT=3000
-JWT_SECRET=your-super-secret-jwt-key-change-in-production
-JWT_EXPIRES_IN=7d
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/matcha?retryWrites=true&w=majority
-FIREBASE_PROJECT_ID=your-firebase-project-id
-FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
-FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@your-project.iam.gserviceaccount.com
-```
+
 
 Chạy backend:
 
